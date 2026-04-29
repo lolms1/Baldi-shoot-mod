@@ -24,6 +24,19 @@ namespace BaldiTestMod
             harmony.PatchAllConditionals();
 
             LoadingEvents.RegisterOnAssetsLoaded(Info, LoadMyAssets(), LoadingEventOrder.Start);
+            GeneratorManagement.Register(this, GenerationModType.Addend, GeneratorChanges);
+        }
+
+        void GeneratorChanges(string floorname, int levelId, SceneObject obj)
+        {
+            obj.shopItems = obj.shopItems.AddRangeToArray(new WeightedItemObject[]
+                {
+                    new WeightedItemObject()
+                    {
+                        selection = assetMan.Get<ItemObject>("TestItem"),
+                        weight = 80
+                    },
+                });
         }
         IEnumerator LoadMyAssets()
         {
@@ -44,7 +57,7 @@ namespace BaldiTestMod
                 .SetEnum("TestItem")
                 .SetNameAndDescription("Itm_Test", "Desc_Test")
                 .SetShopPrice(100)
-                .SetGeneratorCost(10)
+                .SetGeneratorCost(1)
                 .SetItemComponent<Item>()
                 .Build();
             
