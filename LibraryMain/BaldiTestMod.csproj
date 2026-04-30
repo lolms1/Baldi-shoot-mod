@@ -9,6 +9,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Reference Include="0Harmony">
       <HintPath>..\..\..\..\..\..\SteamLibrary\steamapps\common\Baldi's Basics Plus\BepInEx\core\0Harmony.dll</HintPath>
     </Reference>

@@ -13,6 +13,7 @@ namespace BaldiTestMod
     [BepInPlugin("baldi.test.mod.setup", "Baldi test mod", "1.0.0.1")]
 
     [BepInDependency("mtm101.rulerp.bbplus.baldidevapi")]
+    [HarmonyPatch(typeof(Principal))]
 
     public class BasePlugin : BaseUnityPlugin
     {
