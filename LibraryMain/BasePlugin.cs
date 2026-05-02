@@ -35,7 +35,7 @@ namespace BaldiTestMod
                     new WeightedItemObject()
                     {
                         selection = assetMan.Get<ItemObject>("TestItem"),
-                        weight = 80
+                        weight = 500
                     },
                 });
         }
@@ -57,9 +57,9 @@ namespace BaldiTestMod
                 .SetSprites(small, big)
                 .SetEnum("TestItem")
                 .SetNameAndDescription("Itm_Test", "Desc_Test")
-                .SetShopPrice(100)
+                .SetShopPrice(10)
                 .SetGeneratorCost(1)
-                .SetItemComponent<Item>()
+                .SetItemComponent<TestItem>()
                 .Build();
             
             assetMan.Add<ItemObject>("TestItem", testItem);
