@@ -2,9 +2,10 @@
 using HarmonyLib;
 using MTM101BaldAPI;
 using MTM101BaldAPI.AssetTools;
+using MTM101BaldAPI.Components;
+using MTM101BaldAPI.Components.Animation;
 using MTM101BaldAPI.ObjectCreation;
 using MTM101BaldAPI.Registers;
-using MTM101BaldAPI.Components;
 using System.Collections;
 using UnityEngine;
 
@@ -18,6 +19,7 @@ namespace BaldiTestMod
     public class BasePlugin : BaseUnityPlugin
     {
         public static AssetManager assetMan = new AssetManager();
+
         public void Awake()
         {
             Harmony harmony = new Harmony("baldi.test.mod.setup");
@@ -67,6 +69,7 @@ namespace BaldiTestMod
             yield break;
         }
 
+        
         IEnumerator RegularLoad() { yield break; }
         IEnumerator PostLoad() { yield break; }
     }

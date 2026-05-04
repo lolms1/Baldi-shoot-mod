@@ -3,6 +3,7 @@ using HarmonyLib;
 using MTM101BaldAPI;
 using MTM101BaldAPI.AssetTools;
 using MTM101BaldAPI.Components;
+using MTM101BaldAPI.Components.Animation;
 using MTM101BaldAPI.ObjectCreation;
 using MTM101BaldAPI.Registers;
 using System.Collections;
@@ -11,46 +12,6 @@ using UnityEngine.AI;
 
 namespace BaldiTestMod
 {
-    /// <summary>
-    /// Patches Baldi's PlayerInSight method to freeze him in place when he spots the player.
-    /// This demonstrates how to intercept NPC behavior states and modify them.
-    ///
-    /// The private "navigator" field is accessed via AccessTools because it's not publicly exposed.
-    /// </summary>
-    [HarmonyPatch(typeof(Baldi_StateBase))]
-    [HarmonyPatch("PlayerInSight")]
-    class BaldiFreezeWhenSeenPatch
-    {
-        static bool Prefix(Baldi_StateBase __instance, PlayerManager player)
-        {
-            // Get the Baldi instance from the state base (protected field)
-            Baldi baldi = (Baldi)AccessTools.Field(typeof(Baldi_StateBase), "baldi").GetValue(__instance);
-
-            // Get the Navigator component (private field on Baldi)
-            var navigatorField = AccessTools.Field(typeof(Baldi), "navigator");
-            Navigator navigator = (Navigator)navigatorField.GetValue(baldi);
-
-            // Store the original max speed for potential future unfreezing
-            float originalSpeed = navigator.maxSpeed;
-            // Set both speed and maxSpeed to 0 to completely stop movement
-            navigator.speed = 0;
-            navigator.maxSpeed = 0;
-
-            // Return false to prevent Baldi from starting his chase behavior
-            return false;
-        }
-
-        /// <summary>
-        /// Coroutine to unfreeze Baldi after a delay.
-        /// Currently unused, but kept as a reference for implementing timed freeze mechanics.
-        /// </summary>
-        static IEnumerator UnfreezeAfterDelay(Navigator navigator, float originalSpeed, float delay)
-        {
-            yield return new WaitForSeconds(delay);
-            navigator.maxSpeed = originalSpeed;
-            navigator.speed = originalSpeed;
-        }
-    }
 
     /// <summary>
     /// Patches Baldi's GetAngry method to increase his anger by a flat amount.
@@ -71,10 +32,36 @@ namespace BaldiTestMod
         {
             var angerField = AccessTools.Field(typeof(Baldi), "anger");
             float anger = (float)angerField.GetValue(__instance);
-            anger += 10f;
+            anger += 4f;
             // Must call SetValue because float is a value type — GetValue returns a copy
             angerField.SetValue(__instance, anger);
             return false; // Prevent original GetAngry from executing
+        }
+    }
+    [HarmonyPatch(typeof(Animator), "Play", new Type[] { typeof(string), typeof(int), typeof(float) })]
+    class BaldiSlapReskinPatch
+    {
+        static void Postfix(Animator __instance, string stateName, int layer, float normalizedTime)
+        {
+            if (__instance.gameObject.name.Contains("Baldi") && stateName == "BAL_Slap")
+            {
+                var spriteRenderer = __instance.GetComponentInChildren<SpriteRenderer>();
+                if (spriteRenderer != null)
+                {
+                    spriteRenderer.sprite = BasePlugin.assetMan.Get<Sprite>("Test_Sprite_Big");
+                    __instance.enabled = false;
+
+                    __instance.gameObject.GetComponent<MonoBehaviour>().StartCoroutine(
+                        ReenableAnimator(__instance, 1f)
+                    );
+                }
+            }
+        }
+
+        static IEnumerator ReenableAnimator(Animator animator, float delay)
+        {
+            yield return new WaitForSeconds(delay);
+            animator.enabled = true;
         }
     }
 }
