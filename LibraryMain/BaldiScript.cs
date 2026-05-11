@@ -24,8 +24,7 @@ namespace BaldiTestMod
     /// This is different from reference types (like Navigator) where GetValue returns
     /// a reference and you can modify it directly without SetValue.
     /// </summary>
-    [HarmonyPatch(typeof(Baldi))]
-    [HarmonyPatch("GetAngry")]
+    [HarmonyPatch(typeof(Baldi), "GetAngry")]
     class BaldiChangingAngry
     {
         static bool Prefix(Baldi __instance)
@@ -38,30 +37,21 @@ namespace BaldiTestMod
             return false; // Prevent original GetAngry from executing
         }
     }
-    [HarmonyPatch(typeof(Animator), "Play", new Type[] { typeof(string), typeof(int), typeof(float) })]
-    class BaldiSlapReskinPatch
+    [HarmonyPatch(typeof(Baldi), "Initialize")]
+    class BaldiSpriteOverlayPatch
     {
-        static void Postfix(Animator __instance, string stateName, int layer, float normalizedTime)
+        static void Postfix(Baldi __instance)
         {
-            if (__instance.gameObject.name.Contains("Baldi") && stateName == "BAL_Slap")
+            var spriteRenderer = __instance.GetComponentInChildren<SpriteRenderer>();
+            if (spriteRenderer == null)
             {
-                var spriteRenderer = __instance.GetComponentInChildren<SpriteRenderer>();
-                if (spriteRenderer != null)
-                {
-                    spriteRenderer.sprite = BasePlugin.assetMan.Get<Sprite>("Test_Sprite_Big");
-                    __instance.enabled = false;
-
-                    __instance.gameObject.GetComponent<MonoBehaviour>().StartCoroutine(
-                        ReenableAnimator(__instance, 1f)
-                    );
-                }
+                Debug.LogError("[BaldiReskin] No SpriteRenderer found on Baldi!");
+                return;
             }
-        }
 
-        static IEnumerator ReenableAnimator(Animator animator, float delay)
-        {
-            yield return new WaitForSeconds(delay);
-            animator.enabled = true;
+            if (spriteRenderer.GetComponent<SpriteOverlay>() != null) return;
+
+            spriteRenderer.gameObject.AddComponent<SpriteOverlay>();
         }
     }
 }
