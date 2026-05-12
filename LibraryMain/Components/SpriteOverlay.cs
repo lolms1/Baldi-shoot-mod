@@ -69,8 +69,6 @@ namespace BaldiTestMod
             myPropertyBlock.SetFloat("_SpriteRotation", copyPropertyBlock.GetFloat("_SpriteRotation"));
 
             myRenderer.SetPropertyBlock(myPropertyBlock);
-
-            Debug.Log($"Sprite changed to: {toCopy.sprite.name}");
         }
     }
 }
