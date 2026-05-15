@@ -37,7 +37,7 @@ namespace BaldiTestMod
             Collider col = beam.GetComponent<Collider>();
             if (col != null) GameObject.Destroy(col);
 
-            GameObject.Destroy(beam, 4f);
+            GameObject.Destroy(beam, 1f);
 
             return beam;
         }
@@ -47,8 +47,6 @@ namespace BaldiTestMod
             bullet.transform.position = startPosition;
             bullet.transform.rotation = Quaternion.LookRotation(direction);
             bullet.transform.localScale = new Vector3(0.2f, 0.2f, 0.5f);
-            Debug.LogWarning("Created bullet at " + startPosition + " with direction " + direction);
-
             Renderer renderer = bullet.GetComponent<Renderer>();
             bullet.layer = LayerMask.NameToLayer("Billboard");
             renderer.material.color = color;
@@ -59,7 +57,6 @@ namespace BaldiTestMod
             BulletMover mover = bullet.AddComponent<BulletMover>();
             mover.speed = speed;
             mover.direction = direction;
-            Debug.LogWarning("bullet script2");
 
 
             return bullet;

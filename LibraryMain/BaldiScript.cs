@@ -8,141 +8,204 @@ using MTM101BaldAPI.ObjectCreation;
 using MTM101BaldAPI.Registers;
 using System.Collections;
 using UnityEngine;
-using UnityEngine.AI;
 
 namespace BaldiTestMod
 {
-
     /// <summary>
-    /// Patches Baldi's GetAngry method to increase his anger by a flat amount.
-    /// Demonstrates how to modify private fields using AccessTools.SetValue.
-    ///
-    /// Important: Because "anger" is a float (value type), we must:
-    /// 1. GetValue to obtain a copy
-    /// 2. Modify the copy
-    /// 3. SetValue to write the modified copy back
-    /// This is different from reference types (like Navigator) where GetValue returns
-    /// a reference and you can modify it directly without SetValue.
+    /// Custom Baldi state where he stops moving, aims at the player,
+    /// fires 3 lasers and 3 bullets in sequence, then returns to chasing.
+    /// 
+    /// Architecture: Inherits from Baldi_SubState (same as Baldi_Praise).
+    /// While this state is active, the original Baldi_Chase.Update() logic
+    /// (slapping, pathfinding) is completely paused.
     /// </summary>
-    [HarmonyPatch(typeof(Baldi), "GetAngry")]
-    class BaldiChangingAngry
+    public class Baldi_ShootState : Baldi_SubState
     {
-        static bool Prefix(Baldi __instance)
+        // Core state duration — counts down every frame; when it hits zero, Baldi returns to previous behavior
+        private float time;
+        // The player Baldi is aiming at (grabbed from ec.Players[0] on Enter)
+        private PlayerManager target;
+
+        // Phase 1: Laser counters
+        private int lasersFired = 0;
+        private float laserTimer = 0f;
+        private bool phase1Complete = false;
+
+        // Phase 2: Bullet counters
+        private float bulletTimer = 0f;
+        private int bulletsFired = 0;
+
+        // Stores the direction of each laser so its corresponding bullet follows the same path
+        private Vector3[] bulletDirections = new Vector3[3];
+
+        // Visual state: we disable the Animator for the entire state and manually control the sprite
+        private SpriteRenderer aimRenderer;
+        private Sprite aimSprite;
+        private Sprite shootSprite;
+
+        public Baldi_ShootState(NPC npc, Baldi baldi, NpcState previousState, float time)
+            : base(npc, baldi, previousState)
         {
-            var angerField = AccessTools.Field(typeof(Baldi), "anger");
-            float anger = (float)angerField.GetValue(__instance);
-            anger += 0f;
-            angerField.SetValue(__instance, anger);
-            return false;
+            this.time = time;
         }
-    }
-    [HarmonyPatch(typeof(Baldi), "Initialize")]
-    class BaldiSpriteOverlayPatch
-    {
-        static void Postfix(Baldi __instance)
+
+        public override void Enter()
         {
-            var spriteRenderer = __instance.GetComponentInChildren<SpriteRenderer>();
-            if (spriteRenderer == null)
+            base.Enter();
+
+            // Grab the primary player as the target
+            target = baldi.ec.Players[0];
+
+            // Freeze Baldi in place — override both speed and maxSpeed so Navigator doesn't drift
+            npc.Navigator.SetSpeed(0f);
+            npc.Navigator.maxSpeed = 0f;
+
+            // Reset all timers and counters
+            lasersFired = 0;
+            laserTimer = 0f;
+            phase1Complete = false;
+            bulletsFired = 0;
+            bulletTimer = 0f;
+
+            // Load custom sprites from the AssetManager
+            aimSprite = BasePlugin.assetMan.Get<Sprite>("placeholder2");
+            shootSprite = BasePlugin.assetMan.Get<Sprite>("placeholder4");
+
+            // Find the VISIBLE SpriteRenderer (accounting for SpriteOverlay if active)
+            var spriteOverlay = baldi.GetComponentInChildren<SpriteOverlay>();
+            if (spriteOverlay != null)
             {
-                Debug.LogError("[BaldiReskin] No SpriteRenderer found on Baldi!");
-                return;
+                // SpriteOverlay hides the original renderer and creates a child "FakeRenderer"
+                var fakeRendererTransform = spriteOverlay.transform.Find("FakeRenderer");
+                aimRenderer = fakeRendererTransform.GetComponent<SpriteRenderer>();
+            }
+            else
+            {
+                // No SpriteOverlay — use the original renderer directly
+                aimRenderer = baldi.GetComponentInChildren<SpriteRenderer>();
             }
 
-            if (spriteRenderer.GetComponent<SpriteOverlay>() != null) return;
-
-            spriteRenderer.gameObject.AddComponent<SpriteOverlay>();
-        }
-    }
-
-    [HarmonyPatch(typeof(Baldi_StateBase))]
-    [HarmonyPatch("PlayerInSight")]
-    class BaldiShootPatch
-    {
-        static float lastShootTime = -999f;
-        const float cooldown = 10f;
-
-        static void Postfix(Baldi_StateBase __instance)
-        {
-            Baldi baldi = (Baldi)AccessTools.Field(typeof(Baldi_StateBase), "baldi").GetValue(__instance);
-            if (baldi == null) return;
-
-            if (Time.time - lastShootTime >= cooldown)
+            // Disable the Animator so it doesn't overwrite our custom sprite,
+            // then set the aiming sprite for the entire state duration
+            if (aimRenderer != null)
             {
-                lastShootTime = Time.time;
-                baldi.ShootAtPlayer();
+                // Access the private "animator" field on Baldi via Harmony's AccessTools
+                var animatorField = AccessTools.Field(typeof(Baldi), "animator");
+                Animator animator = (Animator)animatorField.GetValue(baldi);
+
+                animator.enabled = false;
+                aimRenderer.sprite = aimSprite;
             }
         }
-    }
 
-    public static class BaldiShootExtensions
-    {
-        public static void ShootAtPlayer(this Baldi baldi)
+        public override void Update()
         {
-            baldi.StartCoroutine(ShootSequence(baldi));
-        }
+            base.Update();
 
-        private static IEnumerator ShootSequence(Baldi baldi)
-        {
-            Sprite shootSprite = BasePlugin.assetMan.Get<Sprite>("placeholder4");
+            // DeltaTime scaled by the NPC's speed (so fast-forward/slowdown effects apply)
+            // I'll improve it later
+            float deltaTime = Time.deltaTime * npc.TimeScale;
 
-            var angerField = AccessTools.Field(typeof(Baldi), "animator");
-            Animator animator = (Animator)angerField.GetValue(baldi);
-
-            PlayerManager player = baldi.ec.Players[0];
-            if (player == null) yield break;
-
-            Vector3 baldiPos = baldi.transform.position + Vector3.up * 2f;
-            Vector3 playerPos = player.transform.position;
-            Vector3 direction = (playerPos - baldiPos).normalized;
-
-            Vector3[] bulletDirections = new Vector3[3];
-
-            for (int i = 0; i < 3; i++)
+            if (!phase1Complete)
             {
-                Vector3 CurrentplayerPos = player.transform.position;
-                Vector3 baseDirection = (CurrentplayerPos - baldiPos).normalized;
+                // PHASE 1: Fire 3 lasers with 0.2s interval
+                laserTimer -= deltaTime;
 
-                float randomAngleX = UnityEngine.Random.Range(-0.5f, 0.5f); 
-                float randomAngleY = UnityEngine.Random.Range(-0.5f, 0.5f); 
-
-                Vector3 laserDirection = Quaternion.Euler(randomAngleX, randomAngleY, 0f) * baseDirection;
-
-                Vector3 startPos = baldiPos;
-
-                CreateGameobject.CreateLaserBeam(startPos, laserDirection, 43333f, Color.red);
-
-                bulletDirections[i] = laserDirection;
-
-                yield return new WaitForSeconds(1f);
-            }
-
-            yield return new WaitForSeconds(0.3f);
-
-            for (int i = 0; i < 3; i++)
-            {
-                Vector3 bulletStartPos = baldiPos + baldi.transform.right * (i - 1) * 0.3f;
-
-                CreateGameobject.CreateBullet(bulletStartPos, bulletDirections[i], 20f, new Color(1f, 0.5f, 0f));
-
-                if (i < 2)
+                if (laserTimer <= 0f && lasersFired < 3)
                 {
-                    yield return new WaitForSeconds(1f);
+                    FireLaser();
+                    lasersFired++;
+                    laserTimer = 0.2f; // Reset interval timer
+                }
+
+                if (lasersFired >= 3)
+                {
+                    phase1Complete = true;
+                    bulletTimer = 0.1f; // Small pause between last laser and first bullet
                 }
             }
-        }
-       /* private static IEnumerator PlayOneFrameAnimation(Baldi baldi, Sprite frame, float duration)
-        {
-            var spriteRenderer = baldi.GetComponentInChildren<SpriteRenderer>();
-            Debug.LogWarning("getting spriterendere");
-            if (spriteRenderer == null) yield break;
-            Debug.LogWarning("NOT got null on spriterender");
+            else
+            {
+                // PHASE 2: Fire 3 bullets with 0.4s interval 
+                bulletTimer -= deltaTime;
 
-            Sprite originalSprite = spriteRenderer.sprite;
-            spriteRenderer.sprite = frame;
-            yield return new WaitForSeconds(duration);
-            spriteRenderer.sprite = originalSprite;
-            Debug.LogWarning("did reset sprite");
+                if (bulletTimer <= 0f && bulletsFired < 3)
+                {
+                    FireBullet();
+                    bulletsFired++;
+                    bulletTimer = 0.4f; // Reset interval timer
+                }
+            }
+
+            // Main state timer when expired, return to previous behavior
+            time -= deltaTime;
+            if (time <= 0f)
+            {
+                npc.behaviorStateMachine.ChangeState(previousState);
+            }
         }
-       */
+
+        public override void Exit()
+        {
+            base.Exit();
+
+            // Re-enable the Animator so Baldi resumes normal animations
+            var animatorField = AccessTools.Field(typeof(Baldi), "animator");
+            Animator animator = (Animator)animatorField.GetValue(baldi);
+            animator.enabled = true;
+
+            // Restore Baldi's original speed
+            npc.Navigator.SetSpeed(baldi.baseSpeed);
+            npc.Navigator.maxSpeed = baldi.baseSpeed;
+        }
+
+        /// <summary>
+        /// Fires a single laser beam with random spread.
+        /// Saves the direction so the corresponding bullet uses the same path.
+        /// Plays a one-frame "shoot" animation overlay.
+        /// </summary>
+        private void FireLaser()
+        {
+            // Start position slightly above Baldi (eye level)
+            Vector3 baldiPos = baldi.transform.position + Vector3.up * 2f;
+            Vector3 playerPos = target.transform.position;
+
+            // Base direction toward player
+            Vector3 baseDirection = (playerPos - baldiPos).normalized;
+
+            // Add random spread: ±0.5 degrees on both axes
+            float randomAngleX = UnityEngine.Random.Range(-0.5f, 0.5f);
+            float randomAngleY = UnityEngine.Random.Range(-0.5f, 0.5f);
+            Vector3 laserDirection = Quaternion.Euler(randomAngleX, randomAngleY, 0f) * baseDirection;
+
+            // Save this laser's direction for its bullet
+            bulletDirections[lasersFired] = laserDirection;
+
+            // Create the visual laser beam (pure visual, no collision)
+            CreateGameobject.CreateLaserBeam(baldiPos, laserDirection, 15f, Color.red);
+        }
+
+        /// <summary>
+        /// Fires a single bullet along the direction of the corresponding laser.
+        /// </summary>
+        private void FireBullet()
+        {
+            Vector3 baldiPos = baldi.transform.position + Vector3.up * 2f;
+            CreateGameobject.CreateBullet(baldiPos, bulletDirections[bulletsFired], 20f, new Color(1f, 0.5f, 0f));
+            baldi.StartCoroutine(PlayShootFrame());
+        }
+
+        /// <summary>
+        /// Coroutine that swaps to the shoot sprite for 0.1 seconds, then restores the aim sprite.
+        /// This gives a visual "kick" effect when Baldi fires a bullet.
+        /// </summary>
+        private IEnumerator PlayShootFrame()
+        {
+            if (aimRenderer == null || shootSprite == null) yield break;
+
+            aimRenderer.sprite = shootSprite;
+            yield return new WaitForSeconds(0.1f);
+            aimRenderer.sprite = aimSprite;
+        }
     }
 }

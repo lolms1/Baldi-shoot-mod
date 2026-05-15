@@ -55,12 +55,14 @@ namespace BaldiTestMod
             Sprite placeholder = AssetLoader.SpriteFromMod(this, Vector2.one / 5f, 50f, "placeholder2.png");
             Sprite placeholder2 = AssetLoader.SpriteFromMod(this, Vector2.one / 2f, 50f, "placeholder3.png");
             Sprite placeholder3 = AssetLoader.SpriteFromMod(this, Vector2.one / 2f, 50f, "placeholder4.png");
+            Sprite placeholder4 = AssetLoader.SpriteFromMod(this, Vector2.one / 2f, 50f, "title.png");
 
             assetMan.Add<Sprite>("Test_Sprite_Small", small);
             assetMan.Add<Sprite>("placeholder", big);
             assetMan.Add<Sprite>("placeholder2", placeholder);
             assetMan.Add<Sprite>("placeholder3", placeholder2);
             assetMan.Add<Sprite>("placeholder4", placeholder3);
+            assetMan.Add<Sprite>("placeholder5", placeholder4);
 
             ItemObject testItem = new ItemBuilder(Info)
                 .SetSprites(small, big)
@@ -73,11 +75,11 @@ namespace BaldiTestMod
             
             assetMan.Add<ItemObject>("TestItem", testItem);
 
-            currentSpriteReplacements["Slap_Sheet_0"] = assetMan.Get<Sprite>("placeholder");
-            currentSpriteReplacements["Slap_Sheet_1"] = assetMan.Get<Sprite>("placeholder2");
-            currentSpriteReplacements["Slap_Sheet_2"] = assetMan.Get<Sprite>("placeholder3");
-            currentSpriteReplacements["Slap_Sheet_3"] = assetMan.Get<Sprite>("placeholder4");
-            currentSpriteReplacements["Slap_Sheet_4"] = assetMan.Get<Sprite>("placeholder");
+            currentSpriteReplacements["Slap_Sheet_0"] = assetMan.Get<Sprite>("placeholder5");
+            currentSpriteReplacements["Slap_Sheet_1"] = assetMan.Get<Sprite>("placeholder5");
+            currentSpriteReplacements["Slap_Sheet_2"] = assetMan.Get<Sprite>("placeholder5");
+            currentSpriteReplacements["Slap_Sheet_3"] = assetMan.Get<Sprite>("placeholder5");
+            currentSpriteReplacements["Slap_Sheet_4"] = assetMan.Get<Sprite>("placeholder5");
 
             yield break;
         }
