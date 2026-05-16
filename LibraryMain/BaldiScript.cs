@@ -53,6 +53,14 @@ namespace BaldiTestMod
         {
             base.Enter();
 
+            SoundObject shootSound = BasePlugin.assetMan.Get<SoundObject>("BaldiShootSound");
+            if (shootSound != null)
+            {
+                var audmanField = AccessTools.Field(typeof(Baldi), "audMan");
+                AudioManager audMan = (AudioManager)audmanField.GetValue(baldi);
+                audMan.PlaySingle(shootSound);
+            }
+
             // Grab the primary player as the target
             target = baldi.ec.Players[0];
 

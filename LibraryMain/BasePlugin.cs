@@ -45,7 +45,7 @@ namespace BaldiTestMod
         }
         IEnumerator LoadMyAssets()
         {
-            yield return 1;
+            yield return 2;
 
             yield return "Loading test item...";
 
@@ -80,6 +80,29 @@ namespace BaldiTestMod
             currentSpriteReplacements["Slap_Sheet_2"] = assetMan.Get<Sprite>("placeholder5");
             currentSpriteReplacements["Slap_Sheet_3"] = assetMan.Get<Sprite>("placeholder5");
             currentSpriteReplacements["Slap_Sheet_4"] = assetMan.Get<Sprite>("placeholder5");
+
+            yield return "Loading audio..";
+
+            AudioClip shootClip = AssetLoader.AudioClipFromMod(this, "testing.mp3");
+            AudioClip shootClip2 = AssetLoader.AudioClipFromMod(this, "testing2.mp3");
+
+            SoundObject shootSound = ObjectCreators.CreateSoundObject(
+                shootClip,
+                "Sfx_Baldi_Shoot",
+                SoundType.Effect,
+                Color.red
+            );
+            shootSound.subtitle = true;
+
+            SoundObject shootSound2 = ObjectCreators.CreateSoundObject(
+                shootClip2,
+                "Sfx_Baldi_Shoot",
+                SoundType.Effect,
+                Color.red
+            );
+            shootSound2.subtitle = true;
+            assetMan.Add<SoundObject>("BaldiShootSound", shootSound);
+            assetMan.Add<SoundObject>("BaldiShootSound2", shootSound2);
 
             yield break;
         }
