@@ -34,6 +34,9 @@ namespace BaldiTestMod
         // Phase 2: Bullet counters
         private float bulletTimer = 0f;
         private int bulletsFired = 0;
+        // Phase 3: Placing bananas
+        private bool phase2Complete = false;
+        private float cleanupTimer = 0f;
 
         // Stores the direction of each laser so its corresponding bullet follows the same path
         private Vector3[] bulletDirections = new Vector3[3];
@@ -74,9 +77,12 @@ namespace BaldiTestMod
             phase1Complete = false;
             bulletsFired = 0;
             bulletTimer = 0f;
+            phase2Complete = false;
+            cleanupTimer = 0f;
 
-            // Load custom sprites from the AssetManager
-            aimSprite = BasePlugin.assetMan.Get<Sprite>("placeholder2");
+
+        // Load custom sprites from the AssetManager
+        aimSprite = BasePlugin.assetMan.Get<Sprite>("placeholder2");
             shootSprite = BasePlugin.assetMan.Get<Sprite>("placeholder4");
 
             // Find the VISIBLE SpriteRenderer (accounting for SpriteOverlay if active)
@@ -132,16 +138,31 @@ namespace BaldiTestMod
                     bulletTimer = 0.1f; // Small pause between last laser and first bullet
                 }
             }
-            else
+            else if (!phase2Complete)
             {
-                // PHASE 2: Fire 3 bullets with 0.4s interval 
                 bulletTimer -= deltaTime;
 
                 if (bulletTimer <= 0f && bulletsFired < 3)
                 {
                     FireBullet();
                     bulletsFired++;
-                    bulletTimer = 0.4f; // Reset interval timer
+                    bulletTimer = 0.4f;
+                }
+
+                if (bulletsFired >= 3)
+                {
+                    phase2Complete = true;
+                    cleanupTimer = 2f; 
+                }
+            }
+            else
+            {
+                cleanupTimer -= deltaTime;
+
+                if (cleanupTimer <= 0f)
+                {
+                    ProcessAllHits();
+                    npc.behaviorStateMachine.ChangeState(previousState);
                 }
             }
 
@@ -190,7 +211,7 @@ namespace BaldiTestMod
             bulletDirections[lasersFired] = laserDirection;
 
             // Create the visual laser beam (pure visual, no collision)
-            CreateGameobject.CreateLaserBeam(baldiPos, laserDirection, 15f, Color.red);
+            CreateGameobject.CreateLaserBeam(baldiPos, laserDirection, 1000f, Color.red);
         }
 
         /// <summary>
@@ -199,7 +220,7 @@ namespace BaldiTestMod
         private void FireBullet()
         {
             Vector3 baldiPos = baldi.transform.position + Vector3.up * 2f;
-            CreateGameobject.CreateBullet(baldiPos, bulletDirections[bulletsFired], 20f, new Color(1f, 0.5f, 0f));
+            CreateGameobject.CreateBullet(baldi.ec , baldiPos, bulletDirections[bulletsFired], 20f, new Color(1f, 0.5f, 0f), baldi);
             baldi.StartCoroutine(PlayShootFrame());
         }
 
@@ -214,6 +235,80 @@ namespace BaldiTestMod
             aimRenderer.sprite = shootSprite;
             yield return new WaitForSeconds(0.1f);
             aimRenderer.sprite = aimSprite;
+        }
+
+        private void ProcessAllHits()
+        {
+            ITM_NanaPeel bananaPrefab = null;
+            foreach (var item in Resources.FindObjectsOfTypeAll<ITM_NanaPeel>())
+            {
+                if (item.gameObject.scene.name == null)
+                {
+                    bananaPrefab = item;
+                    break;
+                }
+            }
+
+            Vector3 shootDirection = (target.transform.position - baldi.transform.position).normalized;
+
+            foreach (var kvp in BulletComponent.hitCounts)
+            {
+                Entity targetEntity = kvp.Key;
+                int hits = kvp.Value;
+
+                if (targetEntity == null) continue;
+
+                var freezeMod = new MovementModifier(Vector3.zero, 0f);
+                targetEntity.ExternalActivity.moveMods.Add(freezeMod);
+
+                if (BulletComponent.appliedModifiers.ContainsKey(targetEntity))
+                {
+                    targetEntity.ExternalActivity.moveMods.Remove(BulletComponent.appliedModifiers[targetEntity]);
+                }
+
+                float randomAngle = UnityEngine.Random.Range(-45f, 45);
+                Vector3 pushDirection = Quaternion.Euler(0f, randomAngle, 0f) * shootDirection;
+
+                float slideSpeed;
+                switch (hits)
+                {
+                    case 1: slideSpeed = 15f; break;
+                    case 2: slideSpeed = 60f; break;
+                    case 3: slideSpeed = 500f; break;
+                    default: slideSpeed = 15f; break;
+                }
+
+                if (bananaPrefab != null)
+                {
+                    ITM_NanaPeel banana = GameObject.Instantiate(bananaPrefab);
+
+                    var speedField = AccessTools.Field(typeof(ITM_NanaPeel), "speed");
+                    speedField.SetValue(banana, slideSpeed);
+
+                    var startHeightField = AccessTools.Field(typeof(ITM_NanaPeel), "startHeight");
+                    startHeightField.SetValue(banana, 0f);
+
+                    Vector3 spawnPos = targetEntity.transform.position;
+                    banana.Spawn(baldi.ec, spawnPos, pushDirection, 0f); 
+                }
+
+                Force pushForce = new Force(pushDirection, 20f, -30f);
+                targetEntity.AddForce(pushForce);
+
+                baldi.StartCoroutine(RemoveFreezeAfterDelay(targetEntity, freezeMod, 0.3f));
+            }
+
+            BulletComponent.hitCounts.Clear();
+            BulletComponent.appliedModifiers.Clear();
+        }
+
+        private IEnumerator RemoveFreezeAfterDelay(Entity targetEntity, MovementModifier freezeMod, float delay)
+        {
+            yield return new WaitForSeconds(delay);
+            if (targetEntity != null && targetEntity.ExternalActivity != null)
+            {
+                targetEntity.ExternalActivity.moveMods.Remove(freezeMod);
+            }
         }
     }
 }
