@@ -10,7 +10,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
 
-namespace BaldiTestMod
+namespace BaldiShootCore
 {
     public static class CreateGameobject
     {

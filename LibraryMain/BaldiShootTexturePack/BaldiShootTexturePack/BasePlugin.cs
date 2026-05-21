@@ -7,14 +7,16 @@ using MTM101BaldAPI.Components.Animation;
 using MTM101BaldAPI.ObjectCreation;
 using MTM101BaldAPI.Registers;
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+using UnityEngine.Rendering;
 
-namespace BaldiTestMod
+namespace BaldiShootTexturePack
 {
-    [BepInPlugin("baldi.test.mod.setup", "Baldi test mod", "1.0.0.1")]
+    [BepInPlugin("anton.chigurh.mod.setup", "Anton Chigurh mod", "1.0.0.0")]
 
     [BepInDependency("mtm101.rulerp.bbplus.baldidevapi")]
-    [HarmonyPatch(typeof(Principal))]
 
     public class BasePlugin : BaseUnityPlugin
     {
@@ -24,62 +26,39 @@ namespace BaldiTestMod
 
         public void Awake()
         {
-            Harmony harmony = new Harmony("baldi.test.mod.setup");
+            Harmony harmony = new Harmony("anton.chigurh.mod.setup");
 
             harmony.PatchAllConditionals();
 
             LoadingEvents.RegisterOnAssetsLoaded(Info, LoadMyAssets(), LoadingEventOrder.Start);
-            GeneratorManagement.Register(this, GenerationModType.Addend, GeneratorChanges);
         }
 
-        void GeneratorChanges(string floorname, int levelId, SceneObject obj)
-        {
-            obj.shopItems = obj.shopItems.AddRangeToArray(new WeightedItemObject[]
-                {
-                    new WeightedItemObject()
-                    {
-                        selection = assetMan.Get<ItemObject>("TestItem"),
-                        weight = 500
-                    },
-                });
-        }
         IEnumerator LoadMyAssets()
         {
-            yield return 2;
+            yield return 3;
 
-            yield return "Loading test item...";
+            yield return "Loading Anton Chigurh sprites...";
 
 
             Sprite small = AssetLoader.SpriteFromMod(this, Vector2.one / 2f, 25f, "placeholder.png");
-            Sprite big = AssetLoader.SpriteFromMod(this, Vector2.one / 2f, 50f, "placeholder.png");
+            Texture2D AntonChigurhSlapsSheets = AssetLoader.TextureFromMod(this, "anton_chigurhslaps.png");
             Sprite placeholder = AssetLoader.SpriteFromMod(this, Vector2.one / 5f, 50f, "placeholder2.png");
             Sprite placeholder2 = AssetLoader.SpriteFromMod(this, Vector2.one / 2f, 50f, "placeholder3.png");
             Sprite placeholder3 = AssetLoader.SpriteFromMod(this, Vector2.one / 2f, 50f, "placeholder4.png");
-            Sprite placeholder4 = AssetLoader.SpriteFromMod(this, Vector2.one / 2f, 50f, "title.png");
 
             assetMan.Add<Sprite>("Test_Sprite_Small", small);
-            assetMan.Add<Sprite>("placeholder", big);
             assetMan.Add<Sprite>("placeholder2", placeholder);
             assetMan.Add<Sprite>("placeholder3", placeholder2);
             assetMan.Add<Sprite>("placeholder4", placeholder3);
-            assetMan.Add<Sprite>("placeholder5", placeholder4);
 
-            ItemObject testItem = new ItemBuilder(Info)
-                .SetSprites(small, big)
-                .SetEnum("TestItem")
-                .SetNameAndDescription("Itm_Test", "Desc_Test")
-                .SetShopPrice(10)
-                .SetGeneratorCost(1)
-                .SetItemComponent<TestItem>()
-                .Build();
-            
-            assetMan.Add<ItemObject>("TestItem", testItem);
-
-            currentSpriteReplacements["Slap_Sheet_0"] = assetMan.Get<Sprite>("placeholder5");
-            currentSpriteReplacements["Slap_Sheet_1"] = assetMan.Get<Sprite>("placeholder5");
-            currentSpriteReplacements["Slap_Sheet_2"] = assetMan.Get<Sprite>("placeholder5");
-            currentSpriteReplacements["Slap_Sheet_3"] = assetMan.Get<Sprite>("placeholder5");
-            currentSpriteReplacements["Slap_Sheet_4"] = assetMan.Get<Sprite>("placeholder5");
+            Sprite[] AntonChigurhSlapsSpritesArray = AssetLoader.SpritesFromSpritesheet(
+                4,
+                2,
+                35f,
+                Vector2.one / 2f,
+                AntonChigurhSlapsSheets
+            );
+            Sprite[] AntonChigurhSlapsSprites = AntonChigurhSlapsSpritesArray.Take(5).ToArray();
 
             yield return "Loading audio..";
 
@@ -104,10 +83,18 @@ namespace BaldiTestMod
             assetMan.Add<SoundObject>("BaldiShootSound", shootSound);
             assetMan.Add<SoundObject>("BaldiShootSound2", shootSound2);
 
+            yield return "Replacing Baldi's sprites...";
+
+            currentSpriteReplacements["Slap_Sheet_0"] = AntonChigurhSlapsSprites[0];
+            currentSpriteReplacements["Slap_Sheet_1"] = AntonChigurhSlapsSprites[1];
+            currentSpriteReplacements["Slap_Sheet_2"] = AntonChigurhSlapsSprites[2];
+            currentSpriteReplacements["Slap_Sheet_3"] = AntonChigurhSlapsSprites[3];
+            currentSpriteReplacements["Slap_Sheet_4"] = AntonChigurhSlapsSprites[4];
+
             yield break;
         }
 
-        
+
         IEnumerator RegularLoad() { yield break; }
         IEnumerator PostLoad() { yield break; }
     }

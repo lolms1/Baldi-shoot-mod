@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace BaldiTestMod
+namespace BaldiShootCore
 {
     public class BulletComponent : MonoBehaviour
     {

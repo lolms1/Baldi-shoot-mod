@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 
-namespace BaldiTestMod
+namespace BaldiShootTexturePack
 {
 
     // Originally from BaldiTexturePacks by benjaminpants (MIT License)

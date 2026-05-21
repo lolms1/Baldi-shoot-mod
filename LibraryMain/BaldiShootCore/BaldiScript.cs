@@ -9,7 +9,7 @@ using MTM101BaldAPI.Registers;
 using System.Collections;
 using UnityEngine;
 
-namespace BaldiTestMod
+namespace BaldiShootCore
 {
     /// <summary>
     /// Custom Baldi state where he stops moving, aims at the player,
@@ -83,7 +83,7 @@ namespace BaldiTestMod
 
         // Load custom sprites from the AssetManager
         aimSprite = BasePlugin.assetMan.Get<Sprite>("placeholder2");
-            shootSprite = BasePlugin.assetMan.Get<Sprite>("placeholder4");
+        shootSprite = BasePlugin.assetMan.Get<Sprite>("placeholder4");
 
             // Find the VISIBLE SpriteRenderer (accounting for SpriteOverlay if active)
             var spriteOverlay = baldi.GetComponentInChildren<SpriteOverlay>();

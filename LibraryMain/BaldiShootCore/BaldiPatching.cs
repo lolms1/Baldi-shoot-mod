@@ -1,7 +1,7 @@
 using HarmonyLib;
 using UnityEngine;
 
-namespace BaldiTestMod
+namespace BaldiShootCore
 {
     /// <summary>
     /// Patches Baldi's GetAngry method.
@@ -23,34 +23,6 @@ namespace BaldiTestMod
             anger += 0f; // Placeholder — change this value to alter Baldi's anger
             angerField.SetValue(__instance, anger);
             return false; // Skip original GetAngry method
-        }
-    }
-
-    /// <summary>
-    /// Auto-attaches SpriteOverlay to Baldi on initialization.
-    /// SpriteOverlay hides the original SpriteRenderer and creates a child renderer
-    /// that copies all properties. This allows texture pack replacements to work
-    /// without modifying the Animator or animation clips.
-    /// 
-    /// Source: Adapted from BaldiTexturePacks by benjaminpants
-    /// </summary>
-    [HarmonyPatch(typeof(Baldi), "Initialize")]
-    class BaldiSpriteOverlayPatch
-    {
-        static void Postfix(Baldi __instance)
-        {
-            // Find ANY SpriteRenderer on Baldi or his children
-            var spriteRenderer = __instance.GetComponentInChildren<SpriteRenderer>();
-            if (spriteRenderer == null)
-            {
-                Debug.LogError("[BaldiReskin] No SpriteRenderer found on Baldi!");
-                return;
-            }
-
-            // Don't add duplicate overlays
-            if (spriteRenderer.GetComponent<SpriteOverlay>() != null) return;
-
-            spriteRenderer.gameObject.AddComponent<SpriteOverlay>();
         }
     }
 

@@ -9,7 +9,7 @@ using MTM101BaldAPI.Registers;
 using System.Collections;
 using UnityEngine;
 
-namespace BaldiTestMod
+namespace BaldiShootCore
 {
 
 
