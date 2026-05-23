@@ -39,7 +39,7 @@ namespace BaldiShootCore
     class BaldiShootPatch
     {
         static float lastShootTime = -999f;
-        const float cooldown = 10f;
+        const float cooldown = 20f;
 
         static void Postfix(Baldi_StateBase __instance)
         {
@@ -68,6 +68,22 @@ namespace BaldiShootCore
                 );
 
                 baldi.behaviorStateMachine.ChangeState(shootState);
+            }
+        }
+    }
+    [HarmonyPatch(typeof(NpcStateMachine), "ChangeState")]
+    class FixPreviousStatePatch
+    {
+        static void Prefix(NpcStateMachine __instance, NpcState newState)
+        {
+            if (__instance.CurrentState is Baldi_ShootState shootState
+                && !(newState is Baldi_ShootState))
+            {
+                shootState.Exit();
+                var previousStateField = AccessTools.Field(typeof(Baldi_SubState), "previousState");
+                var stateBeforeShoot = (NpcState)previousStateField.GetValue(shootState);
+
+                __instance.currentState = stateBeforeShoot;
             }
         }
     }

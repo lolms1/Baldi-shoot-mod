@@ -36,11 +36,18 @@ namespace BaldiShootCore
 
             yield return "Loading Baldi shooting  sprites...";
 
-            Sprite BaldiAimSprite = AssetLoader.SpriteFromMod(this, Vector2.one / 5f, 50f, "placeholder2.png");
-            Sprite BaldiShootSprite = AssetLoader.SpriteFromMod(this, Vector2.one / 2f, 50f, "placeholder4.png");
+            Texture2D AntonChigurhShootingSheets = AssetLoader.TextureFromMod(this, "anton_chigurhshooting.png");
 
-            assetMan.Add<Sprite>("placeholder2", BaldiAimSprite);
-            assetMan.Add<Sprite>("placeholder4", BaldiShootSprite);
+            Sprite[] AntonChigurhShootingSprites = AssetLoader.SpritesFromSpritesheet(
+                2,
+                1,
+                35f,
+                Vector2.one / 2f,
+                AntonChigurhShootingSheets
+            );
+
+            assetMan.Add<Sprite>("BaldiAim", AntonChigurhShootingSprites[0]);
+            assetMan.Add<Sprite>("BaldiShoot", AntonChigurhShootingSprites[1]);
 
 
             yield return "Loading audio..";

@@ -82,8 +82,8 @@ namespace BaldiShootCore
 
 
         // Load custom sprites from the AssetManager
-        aimSprite = BasePlugin.assetMan.Get<Sprite>("placeholder2");
-        shootSprite = BasePlugin.assetMan.Get<Sprite>("placeholder4");
+        aimSprite = BasePlugin.assetMan.Get<Sprite>("BaldiAim");
+        shootSprite = BasePlugin.assetMan.Get<Sprite>("BaldiShoot");
 
             // Find the VISIBLE SpriteRenderer (accounting for SpriteOverlay if active)
             var spriteOverlay = baldi.GetComponentInChildren<SpriteOverlay>();
@@ -119,6 +119,11 @@ namespace BaldiShootCore
             // DeltaTime scaled by the NPC's speed (so fast-forward/slowdown effects apply)
             // I'll improve it later
             float deltaTime = Time.deltaTime * npc.TimeScale;
+
+            if (npc.behaviorStateMachine.CurrentState != this)
+            {
+                return;
+            }
 
             if (!phase1Complete)
             {
@@ -301,6 +306,8 @@ namespace BaldiShootCore
             BulletComponent.hitCounts.Clear();
             BulletComponent.appliedModifiers.Clear();
         }
+
+
 
         private IEnumerator RemoveFreezeAfterDelay(Entity targetEntity, MovementModifier freezeMod, float delay)
         {

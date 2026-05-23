@@ -14,7 +14,7 @@ using UnityEngine.Rendering;
 
 namespace BaldiShootTexturePack
 {
-    [BepInPlugin("anton.chigurh.mod.setup", "Anton Chigurh mod", "1.0.0.0")]
+    [BepInPlugin("anton.chigurh.texturepack.mod.setup", "Anton Chigurh Texture pack mod", "1.0.0.0")]
 
     [BepInDependency("mtm101.rulerp.bbplus.baldidevapi")]
 
@@ -40,16 +40,17 @@ namespace BaldiShootTexturePack
             yield return "Loading Anton Chigurh sprites...";
 
 
-            Sprite small = AssetLoader.SpriteFromMod(this, Vector2.one / 2f, 25f, "placeholder.png");
+            Texture2D AntonChigurhAppleSheets = AssetLoader.TextureFromMod(this, "anton_chigurhsheetsapple.png");
             Texture2D AntonChigurhSlapsSheets = AssetLoader.TextureFromMod(this, "anton_chigurhslaps.png");
-            Sprite placeholder = AssetLoader.SpriteFromMod(this, Vector2.one / 5f, 50f, "placeholder2.png");
+            Texture2D AntonChigurhTutorialSheets = AssetLoader.TextureFromMod(this, "anton_chigurhtutorial.png");
+            Texture2D AntonChigurhCountdownSheets = AssetLoader.TextureFromMod(this, "anton_chigurhsheetscountdown.png");
             Sprite placeholder2 = AssetLoader.SpriteFromMod(this, Vector2.one / 2f, 50f, "placeholder3.png");
             Sprite placeholder3 = AssetLoader.SpriteFromMod(this, Vector2.one / 2f, 50f, "placeholder4.png");
+            Sprite AntonChigurhIdleSprite = AssetLoader.SpriteFromMod(this, Vector2.one / 2f, 35f, "anton_chigurhidle.png");
 
-            assetMan.Add<Sprite>("Test_Sprite_Small", small);
-            assetMan.Add<Sprite>("placeholder2", placeholder);
             assetMan.Add<Sprite>("placeholder3", placeholder2);
             assetMan.Add<Sprite>("placeholder4", placeholder3);
+            assetMan.Add<Sprite>("AntonChigurhIdle", AntonChigurhIdleSprite);
 
             Sprite[] AntonChigurhSlapsSpritesArray = AssetLoader.SpritesFromSpritesheet(
                 4,
@@ -59,6 +60,31 @@ namespace BaldiShootTexturePack
                 AntonChigurhSlapsSheets
             );
             Sprite[] AntonChigurhSlapsSprites = AntonChigurhSlapsSpritesArray.Take(5).ToArray();
+
+            Sprite[] AntonChigurhTutorialSpritesArray = AssetLoader.SpritesFromSpritesheet(
+                4,
+                2,
+                35f,
+                Vector2.one / 2f,
+                AntonChigurhTutorialSheets
+            );
+            Sprite[] AntonChigurhTutorialSprites = AntonChigurhTutorialSpritesArray.Take(7).ToArray();
+
+            Sprite[] AntonChigurhAppleSprites = AssetLoader.SpritesFromSpritesheet(
+                2,
+                1,
+                35f,
+                Vector2.one / 2f,
+                AntonChigurhAppleSheets
+            );
+
+            Sprite[] AntonChigurhCountdownSprites = AssetLoader.SpritesFromSpritesheet(
+                3,
+                1,
+                35f,
+                Vector2.one / 2f,
+                AntonChigurhCountdownSheets
+            );
 
             yield return "Loading audio..";
 
@@ -90,6 +116,28 @@ namespace BaldiShootTexturePack
             currentSpriteReplacements["Slap_Sheet_2"] = AntonChigurhSlapsSprites[2];
             currentSpriteReplacements["Slap_Sheet_3"] = AntonChigurhSlapsSprites[3];
             currentSpriteReplacements["Slap_Sheet_4"] = AntonChigurhSlapsSprites[4];
+
+            currentSpriteReplacements["Baldi_Talk_Standing_Sheet_0"] = AntonChigurhTutorialSprites[0];
+            currentSpriteReplacements["Baldi_Talk_Standing_Sheet_1"] = AntonChigurhTutorialSprites[1];
+            currentSpriteReplacements["Baldi_Talk_Standing_Sheet_2"] = AntonChigurhTutorialSprites[2];
+            currentSpriteReplacements["Baldi_Talk_Standing_Sheet_3"] = AntonChigurhTutorialSprites[3];
+            currentSpriteReplacements["Baldi_Talk_Standing_Sheet_4"] = AntonChigurhTutorialSprites[4];
+            currentSpriteReplacements["Baldi_Talk_Standing_Sheet_5"] = AntonChigurhTutorialSprites[5];
+            currentSpriteReplacements["Baldi_Talk_Standing_Sheet_6"] = AntonChigurhTutorialSprites[6];
+
+            currentSpriteReplacements["BaldiApple_0"] = AntonChigurhAppleSprites[0];
+            currentSpriteReplacements["BaldiApple_1"] = AntonChigurhAppleSprites[1];
+
+            currentSpriteReplacements["BAL_Countdown_Sheet_0"] = AntonChigurhCountdownSprites[0];
+            currentSpriteReplacements["BAL_Countdown_Sheet_1"] = AntonChigurhCountdownSprites[1];
+            currentSpriteReplacements["BAL_Countdown_Sheet_2"] = AntonChigurhCountdownSprites[2];
+
+            for (int i = 0; i <= 99; i++)
+            {
+                string spriteName = $"Baldi_Wave{i:D4}"; // D3 = 0000, 0001, ... 0099
+                currentSpriteReplacements[spriteName] = AntonChigurhIdleSprite; // boiiiiii i wont replace all his spritessss
+            }
+
 
             yield break;
         }

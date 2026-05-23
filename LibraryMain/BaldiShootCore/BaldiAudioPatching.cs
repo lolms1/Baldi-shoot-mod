@@ -31,8 +31,6 @@ namespace BaldiShootCore
                 new WeightedSoundObject { selection = assetMan.Get<SoundObject>("BaldiShootSound"), weight = 100 },
                 new WeightedSoundObject { selection = assetMan.Get<SoundObject>("BaldiShootSound2"), weight = 100 }
             };
-            var correctSoundsField = AccessTools.Field(typeof(Baldi), "correctSounds");
-            correctSoundsField.SetValue(__instance, praiseSounds);
         }
     }
 }
