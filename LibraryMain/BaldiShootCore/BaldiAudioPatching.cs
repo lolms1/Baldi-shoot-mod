@@ -23,9 +23,6 @@ namespace BaldiShootCore
             var appleThanksField = AccessTools.Field(typeof(Baldi), "audAppleThanks");
             appleThanksField.SetValue(__instance, assetMan.Get<SoundObject>("BaldiShootSound"));
 
-            var slapField = AccessTools.Field(typeof(Baldi), "slap");
-            slapField.SetValue(__instance, assetMan.Get<SoundObject>("BaldiShootSound"));
-
             var praiseSounds = new WeightedSoundObject[]
             {
                 new WeightedSoundObject { selection = assetMan.Get<SoundObject>("BaldiShootSound"), weight = 100 },

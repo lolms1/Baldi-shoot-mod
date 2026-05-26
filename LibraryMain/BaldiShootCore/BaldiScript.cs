@@ -28,15 +28,14 @@ namespace BaldiShootCore
 
         // Phase 1: Laser counters
         private int lasersFired = 0;
-        private float laserTimer = 0f;
         private bool phase1Complete = false;
 
         // Phase 2: Bullet counters
-        private float bulletTimer = 0f;
         private int bulletsFired = 0;
         // Phase 3: Placing bananas
         private bool phase2Complete = false;
-        private float cleanupTimer = 0f;
+
+        private bool phase3Complete = false;
 
         // Stores the direction of each laser so its corresponding bullet follows the same path
         private Vector3[] bulletDirections = new Vector3[3];
@@ -45,6 +44,16 @@ namespace BaldiShootCore
         private SpriteRenderer aimRenderer;
         private Sprite aimSprite;
         private Sprite shootSprite;
+
+        private float anger = 1f;
+        private float laserTimer = 0.8f;
+        private float bulletTimer = 0.8f;
+        private float bulletInterval = 0.6f;
+        private float cleanupTimer = 2f;
+        private float coefficient = 2.5f;
+        private Dictionary<string, float> TimersTemp = new Dictionary<string, float>();
+
+        private List<GameObject> activeBullets = new List<GameObject>();
 
         public Baldi_ShootState(NPC npc, Baldi baldi, NpcState previousState, float time)
             : base(npc, baldi, previousState)
@@ -55,6 +64,9 @@ namespace BaldiShootCore
         public override void Enter()
         {
             base.Enter();
+
+            anger = GetAnger(baldi);
+            GetAllTimers();
 
             SoundObject shootSound = BasePlugin.assetMan.Get<SoundObject>("BaldiShootSound");
             if (shootSound != null)
@@ -134,13 +146,13 @@ namespace BaldiShootCore
                 {
                     FireLaser();
                     lasersFired++;
-                    laserTimer = 0.2f; // Reset interval timer
+                    laserTimer = TimersTemp["laserTimer"]; // Reset interval timer
                 }
 
                 if (lasersFired >= 3)
                 {
                     phase1Complete = true;
-                    bulletTimer = 0.1f; // Small pause between last laser and first bullet
+                    bulletTimer = TimersTemp["bulletInterval"]; // Small pause between last laser and first bullet
                 }
             }
             else if (!phase2Complete)
@@ -149,23 +161,27 @@ namespace BaldiShootCore
 
                 if (bulletTimer <= 0f && bulletsFired < 3)
                 {
-                    FireBullet();
+                    var bullet = FireBullet();
+                    activeBullets.Add(bullet);
                     bulletsFired++;
-                    bulletTimer = 0.4f;
+                    bulletTimer = TimersTemp["bulletTimer"];
                 }
 
                 if (bulletsFired >= 3)
                 {
                     phase2Complete = true;
-                    cleanupTimer = 2f; 
+                    cleanupTimer = TimersTemp["cleanupTimer"]; 
                 }
             }
             else
             {
                 cleanupTimer -= deltaTime;
 
-                if (cleanupTimer <= 0f)
+                activeBullets.RemoveAll(x => x == null);
+
+                if ((cleanupTimer <= 0f || activeBullets.Count == 0) && (!phase3Complete))
                 {
+                    phase3Complete = true;
                     ProcessAllHits();
                     npc.behaviorStateMachine.ChangeState(previousState);
                 }
@@ -188,6 +204,19 @@ namespace BaldiShootCore
             Animator animator = (Animator)animatorField.GetValue(baldi);
             animator.enabled = true;
 
+            foreach (var kvp in BulletComponent.appliedModifiers)
+            {
+                if (kvp.Key != null && kvp.Key.ExternalActivity != null)
+                {
+                    kvp.Key.ExternalActivity.moveMods.Remove(kvp.Value);
+                }
+            }
+
+            BulletComponent.hitCounts.Clear();
+            BulletComponent.appliedModifiers.Clear();
+            activeBullets.Clear();
+            TimersTemp.Clear();
+
             // Restore Baldi's original speed
             npc.Navigator.SetSpeed(baldi.baseSpeed);
             npc.Navigator.maxSpeed = baldi.baseSpeed;
@@ -201,7 +230,7 @@ namespace BaldiShootCore
         private void FireLaser()
         {
             // Start position slightly above Baldi (eye level)
-            Vector3 baldiPos = baldi.transform.position + Vector3.up * 2f;
+            Vector3 baldiPos = baldi.transform.position;
             Vector3 playerPos = target.transform.position;
 
             // Base direction toward player
@@ -222,11 +251,12 @@ namespace BaldiShootCore
         /// <summary>
         /// Fires a single bullet along the direction of the corresponding laser.
         /// </summary>
-        private void FireBullet()
+        private GameObject FireBullet()
         {
-            Vector3 baldiPos = baldi.transform.position + Vector3.up * 2f;
-            CreateGameobject.CreateBullet(baldi.ec , baldiPos, bulletDirections[bulletsFired], 20f, new Color(1f, 0.5f, 0f), baldi);
+            Vector3 baldiPos = baldi.transform.position;
+            var bullet = CreateGameobject.CreateBullet(baldi.ec , baldiPos, bulletDirections[bulletsFired], 20f, new Color(1f, 0.5f, 0f), baldi);
             baldi.StartCoroutine(PlayShootFrame());
+            return bullet;
         }
 
         /// <summary>
@@ -302,9 +332,7 @@ namespace BaldiShootCore
 
                 baldi.StartCoroutine(RemoveFreezeAfterDelay(targetEntity, freezeMod, 0.3f));
             }
-
-            BulletComponent.hitCounts.Clear();
-            BulletComponent.appliedModifiers.Clear();
+            this.Exit();
         }
 
 
@@ -316,6 +344,24 @@ namespace BaldiShootCore
             {
                 targetEntity.ExternalActivity.moveMods.Remove(freezeMod);
             }
+        }
+        private float GetAnger(Baldi baldi)
+        {
+            var angerField = AccessTools.Field(typeof(Baldi), "anger");
+            float anger = (float)angerField.GetValue(baldi);
+            return anger;
+        }
+        private void GetAllTimers()
+        {
+            laserTimer = 0.8f / (Mathf.Log(anger, 2f) * coefficient);
+            bulletTimer = 0.8f / (Mathf.Log(anger, 2f) * coefficient);
+            bulletInterval = 0.6f / (Mathf.Log(anger, 2f) * coefficient);
+            cleanupTimer = Mathf.Max(2f / (1f + Mathf.Log(anger, 2f) * coefficient), 1f);
+
+            TimersTemp.Add("laserTimer", laserTimer);
+            TimersTemp.Add("bulletTimer", bulletTimer);
+            TimersTemp.Add("bulletInterval", bulletInterval);
+            TimersTemp.Add("cleanupTimer", cleanupTimer);
         }
     }
 }

@@ -4,7 +4,7 @@ namespace BaldiShootCore
 {
     public class BulletComponent : MonoBehaviour
     {
-        private float speed = 500f;
+        private float speed = 300f;
         private Vector3 direction;
         private bool hasHit = false;
         private Baldi baldi;
@@ -15,7 +15,6 @@ namespace BaldiShootCore
         public void Initialize(Vector3 dir, float spd, Baldi baldi)
         {
             this.direction = dir.normalized;
-            this.speed = 150f;
             this.baldi = baldi;
         }
 

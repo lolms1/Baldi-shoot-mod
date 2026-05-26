@@ -61,7 +61,6 @@ namespace BaldiShootTexturePack
                 }
                 lastSpriteName = toCopy.sprite.name;
             }
-            Debug.LogWarning(toCopy.sprite.name);
 
             myRenderer.color = toCopy.color;
             myRenderer.enabled = toCopy.enabled;
