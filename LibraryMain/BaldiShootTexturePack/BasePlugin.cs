@@ -48,7 +48,7 @@ namespace BaldiShootTexturePack
                 new WeightedItemObject()
                 {
                     selection = trackerItem,
-                    weight = 50
+                    weight = 5
                 }}); 
 
                 levelObj.MarkAsModifiedByMod(Info);
@@ -72,7 +72,7 @@ namespace BaldiShootTexturePack
             Sprite placeholder2 = AssetLoader.SpriteFromMod(this, Vector2.one / 2f, 50f, "placeholder3.png");
             Sprite placeholder3 = AssetLoader.SpriteFromMod(this, Vector2.one / 2f, 50f, "placeholder4.png");
             Sprite AntonChigurhIdleSprite = AssetLoader.SpriteFromMod(this, Vector2.one / 2f, 35f, "anton_chigurhidle.png");
-            Sprite SuitcaseIcon = AssetLoader.SpriteFromMod(this, Vector2.one / 2f, 10f, "suitcase.png");
+            Sprite SuitcaseIcon = AssetLoader.SpriteFromMod(this, Vector2.one / 2f, 100f, "suitcase.png");
 
             assetMan.Add<Sprite>("placeholder3", placeholder2);
             assetMan.Add<Sprite>("placeholder4", placeholder3);
@@ -120,6 +120,38 @@ namespace BaldiShootTexturePack
                 Vector2.one / 2f,
                 AntonChigurhCountdownSheets
             );
+
+            Sprite[] boiii = new Sprite[]
+            {
+                placeholder3,
+                placeholder3,
+                placeholder3,
+                placeholder3,
+                placeholder3,
+                placeholder3,
+                placeholder3,
+                placeholder3,
+                placeholder3,
+                placeholder2
+            };
+
+            Sprite[] boiii2 = new Sprite[]
+            {
+                placeholder3,
+                placeholder3,
+                placeholder3,
+                placeholder3,
+                placeholder3,
+                placeholder3,
+                placeholder3,
+                placeholder3,
+                placeholder3,
+                SuitcaseIcon
+            };
+
+            assetMan.Add<Sprite[]>("ok", boiii);
+            assetMan.Add<Sprite[]>("ok2", boiii2);
+
 
             yield return "Loading audio..";
 
@@ -231,6 +263,17 @@ namespace BaldiShootTexturePack
             currentSpriteReplacements["BAL_Countdown_Sheet_0"] = AntonChigurhCountdownSprites[0];
             currentSpriteReplacements["BAL_Countdown_Sheet_1"] = AntonChigurhCountdownSprites[1];
             currentSpriteReplacements["BAL_Countdown_Sheet_2"] = AntonChigurhCountdownSprites[2];
+
+            currentSpriteReplacements["BaldicatorSheet_0"] = placeholder3;
+            currentSpriteReplacements["BaldicatorSheet_1"] = placeholder3;
+            currentSpriteReplacements["BaldicatorSheet_2"] = placeholder3;
+            currentSpriteReplacements["BaldicatorSheet_3"] = placeholder3;
+            currentSpriteReplacements["BaldicatorSheet_4"] = placeholder3;
+            currentSpriteReplacements["BaldicatorSheet_5"] = placeholder3;
+            currentSpriteReplacements["BaldicatorSheet_6"] = placeholder3;
+            currentSpriteReplacements["BaldicatorSheet_7"] = placeholder3;
+            currentSpriteReplacements["BaldicatorSheet_8"] = SuitcaseIcon;
+            currentSpriteReplacements["BaldicatorSheet_9"] = SuitcaseIcon;
 
             for (int i = 0; i <= 99; i++)
             {

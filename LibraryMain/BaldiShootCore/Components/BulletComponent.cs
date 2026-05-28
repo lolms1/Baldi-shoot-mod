@@ -4,23 +4,28 @@ namespace BaldiShootCore
 {
     public class BulletComponent : MonoBehaviour
     {
-        private float speed = 300f;
+        private float speed;
         private Vector3 direction;
         private bool hasHit = false;
         private Baldi baldi;
+        private bool piercingBullet;
+
+        private HashSet<Entity> hitEntities = new HashSet<Entity>();
 
         public static Dictionary<Entity, int> hitCounts = new Dictionary<Entity, int>();
         public static Dictionary<Entity, MovementModifier> appliedModifiers = new Dictionary<Entity, MovementModifier>();
 
-        public void Initialize(Vector3 dir, float spd, Baldi baldi)
+        public void Initialize(Vector3 dir, float spd, Baldi owner, bool piercing)
         {
             this.direction = dir.normalized;
-            this.baldi = baldi;
+            this.speed = spd;
+            this.piercingBullet = piercing;
+            this.baldi = owner;
         }
 
-        public void Update()
+        void Update()
         {
-            if (!hasHit)
+            if (!hasHit || piercingBullet)
             {
                 transform.position += direction * speed * Time.deltaTime;
             }
@@ -28,21 +33,30 @@ namespace BaldiShootCore
 
         public void OnChildTriggerEnter(Collider other)
         {
-            if (hasHit) return;
-
             Entity target = other.GetComponent<Entity>();
             if (target == null) target = other.GetComponentInParent<Entity>();
             if (target == null) return;
 
-            if (other.CompareTag("Player") || other.CompareTag("NPC") && (other.transform != baldi.transform))
+            // Пропускаем самого Балди
+            if (other.transform == baldi.transform) return;
+
+            if (other.CompareTag("Player") || other.CompareTag("NPC"))
             {
-                hasHit = true;
+                if (hitEntities.Contains(target)) return;
+
+                hitEntities.Add(target);
+
                 RegisterHit(target);
-                Destroy(gameObject, 0.05f);
+
+                if (!piercingBullet)
+                {
+                    hasHit = true;
+                    Destroy(gameObject, 0.05f);
+                }
             }
         }
 
-        void RegisterHit(Entity target)
+        private void RegisterHit(Entity target)
         {
             if (!hitCounts.ContainsKey(target))
             {
@@ -58,14 +72,13 @@ namespace BaldiShootCore
                 actMod.moveMods.Remove(appliedModifiers[target]);
             }
 
-            float slowFactor;
-            switch (currentHits)
+            float slowFactor = currentHits switch
             {
-                case 1: slowFactor = 0.75f; break;
-                case 2: slowFactor = 0.4f; break;
-                case 3: slowFactor = 0f; break;
-                default: slowFactor = 1f; break;
-            }
+                1 => 0.75f,
+                2 => 0.4f,
+                >= 3 => 0f,
+                _ => 1f
+            };
 
             MovementModifier newMod = new MovementModifier(Vector3.zero, slowFactor);
             actMod.moveMods.Add(newMod);

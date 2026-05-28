@@ -16,8 +16,8 @@ namespace BaldiShootCore
     [HarmonyPatch("PlayerInSight")]
     class BaldiShootPatch
     {
+
         static float lastShootTime = -999f;
-        const float cooldown = 4f;
 
         static void Postfix(Baldi_StateBase __instance)
         {
@@ -25,15 +25,25 @@ namespace BaldiShootCore
             Baldi baldi = (Baldi)AccessTools.Field(typeof(Baldi_StateBase), "baldi").GetValue(__instance);
             if (baldi == null) return;
 
+            var angerField = AccessTools.Field(typeof(Baldi), "anger");
+            float anger = (float)angerField.GetValue(baldi);
+
+            float cooldown = BaldiShootingCfg.ShootingCooldown;
+            float coefficient = BaldiShootingCfg.CooldownCoefficient;
+            float cooldownMultiplier = 1f + (Mathf.Log(1f + anger, 2f) * coefficient/2);
+            float currentcooldown = cooldown / cooldownMultiplier;
+
+            bool ignoreStuns = BaldiShootingCfg.IgnoreStuns;
+
             // Don't interrupt praise or an already-running shooting sequence
             NpcState currentState = baldi.behaviorStateMachine.CurrentState;
-            if (currentState is Baldi_Praise || currentState is Baldi_ShootState || currentState is Baldi_Chase_Broken)
+            if (currentState is Baldi_Praise || currentState is Baldi_ShootState || currentState is Baldi_Chase_Broken || currentState is Baldi_Apple)
             {
-                return;
+                if (!ignoreStuns || currentState is Baldi_Chase_Broken) return;
             }
 
             // Check cooldown
-            if (Time.time - lastShootTime >= cooldown)
+            if (Time.time - lastShootTime >= currentcooldown)
             {
                 lastShootTime = Time.time;
 
@@ -41,8 +51,7 @@ namespace BaldiShootCore
                 Baldi_ShootState shootState = new Baldi_ShootState(
                     baldi,           // NPC reference
                     baldi,           // Baldi reference
-                    currentState,    // State to return to after shooting
-                    99f               // State duration in seconds. No matter anymore actually
+                    currentState    // State to return to after shooting
                 );
 
                 baldi.behaviorStateMachine.ChangeState(shootState);
