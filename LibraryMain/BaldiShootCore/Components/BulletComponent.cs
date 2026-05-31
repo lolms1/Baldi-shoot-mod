@@ -1,3 +1,4 @@
+using HarmonyLib;
 using UnityEngine;
 
 namespace BaldiShootCore
@@ -37,7 +38,6 @@ namespace BaldiShootCore
             if (target == null) target = other.GetComponentInParent<Entity>();
             if (target == null) return;
 
-            // Пропускаем самого Балди
             if (other.transform == baldi.transform) return;
 
             if (other.CompareTag("Player") || other.CompareTag("NPC"))
@@ -83,6 +83,10 @@ namespace BaldiShootCore
             MovementModifier newMod = new MovementModifier(Vector3.zero, slowFactor);
             actMod.moveMods.Add(newMod);
             appliedModifiers[target] = newMod;
+            /*
+            SoundObject[] hitsounds = BasePlugin.assetMan.Get<SoundObject[]>("BulletHitsSounds"); // no idea yet how to make own audMan or play this sound
+            audMan.PlaySingle(hitsounds[UnityEngine.Random.Range(0, hitsounds.Length)]);
+            */
         }
     }
 

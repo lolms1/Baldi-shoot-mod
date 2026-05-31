@@ -52,26 +52,51 @@ namespace BaldiShootCore
 
             yield return "Loading audio..";
 
-            AudioClip shootClip = AssetLoader.AudioClipFromMod(this, "testing.mp3");
-            AudioClip shootClip2 = AssetLoader.AudioClipFromMod(this, "testing2.mp3");
+            AudioClip shootClip = AssetLoader.AudioClipFromMod(this, "shoot.wav");
+            AudioClip BaldiAimingClip = AssetLoader.AudioClipFromMod(this, "BaldiAiming.wav");
+            AudioClip BulletHit0Clip = AssetLoader.AudioClipFromMod(this, "BulletHit0.wav");
+            AudioClip BulletHit1Clip = AssetLoader.AudioClipFromMod(this, "BulletHit1.wav");
 
             SoundObject shootSound = ObjectCreators.CreateSoundObject(
                 shootClip,
-                "Sfx_Baldi_Shoot",
+                "*BANG*",
                 SoundType.Effect,
                 Color.red
             );
             shootSound.subtitle = true;
 
-            SoundObject shootSound2 = ObjectCreators.CreateSoundObject(
-                shootClip2,
-                "Sfx_Baldi_Shoot",
+            SoundObject BaldiAimingSound = ObjectCreators.CreateSoundObject(
+                BaldiAimingClip,
+                "*AIMING*",
                 SoundType.Effect,
                 Color.red
             );
-            shootSound2.subtitle = true;
+            shootSound.subtitle = true;
+
+            SoundObject BulletHit0Sound = ObjectCreators.CreateSoundObject(
+                BulletHit0Clip,
+                "*HIT*",
+                SoundType.Effect,
+                Color.red
+            );
+            shootSound.subtitle = true;
+
+            SoundObject BulletHit1Sound = ObjectCreators.CreateSoundObject(
+                BulletHit1Clip,
+                "*HIT*",
+                SoundType.Effect,
+                Color.red
+            );
+            shootSound.subtitle = true;
+
+            SoundObject[] BulletHitsSounds = new SoundObject[] {
+                BulletHit0Sound,
+                BulletHit1Sound,
+            };
+
             assetMan.Add<SoundObject>("BaldiShootSound", shootSound);
-            assetMan.Add<SoundObject>("BaldiShootSound2", shootSound2);
+            assetMan.Add<SoundObject>("BaldiAimingSound", BaldiAimingSound);
+            assetMan.Add<SoundObject[]>("BulletHitsSounds", BulletHitsSounds);
 
             yield break;
         }

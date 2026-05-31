@@ -51,9 +51,13 @@ namespace BaldiShootCore
         private float cleanupTimer;
         private float coefficient;
         private int bulletAmount;
+        private int BaseBulletCapacity;
+        private int CurrentBulletCapacity = 99;
+        private bool Capacity;
         private bool piercingBullet;
 
         Animator animator;
+        AudioManager audMan;
 
         private struct Timers
         {
@@ -79,7 +83,9 @@ namespace BaldiShootCore
             base.Enter();
 
             anger = GetAnger();
+            audMan = GetaudMan();
             CalculateAndGetValues();
+            CheckBulletCapacity();
             PlayAimSound();
             DisableAnimator();
             Debug.LogWarning("anger: " +  anger);
@@ -133,6 +139,7 @@ namespace BaldiShootCore
                     var bullet = FireBullet();
                     activeBullets.Add(bullet);
                     bulletsFired++;
+                    CurrentBulletCapacity--;
                     bulletTimer = timers.bulletTimer;
                 }
 
@@ -152,6 +159,12 @@ namespace BaldiShootCore
                 {
                     phase3Complete = true;
                     ProcessAllHits();
+                    if (CurrentBulletCapacity <= 0)
+                    {
+                        // put here new baldi state
+                        this.Exit();
+                        return;
+                    }
                     npc.behaviorStateMachine.ChangeState(previousState);
                     this.Exit();
                 }
@@ -205,7 +218,7 @@ namespace BaldiShootCore
                 Force pushForce = new Force(pushDirection, 1f, 1f);
                 targetEntity.AddForce(pushForce);
 
-                baldi.StartCoroutine(RemoveFreezeAfterDelay(targetEntity, freezeMod, 0.3f));
+                baldi.StartCoroutine(RemoveFreezeAfterDelay(targetEntity, freezeMod, 0.3f, pushForce));
             }  
         }
 
@@ -270,16 +283,18 @@ namespace BaldiShootCore
             if (aimRenderer == null || shootSprite == null) yield break;
 
             aimRenderer.sprite = shootSprite;
+            PlayShootSound();
             yield return new WaitForSeconds(0.1f);
             aimRenderer.sprite = aimSprite;
         }
 
-        private IEnumerator RemoveFreezeAfterDelay(Entity targetEntity, MovementModifier freezeMod, float delay)
+        private IEnumerator RemoveFreezeAfterDelay(Entity targetEntity, MovementModifier freezeMod, float delay, Force pushForce)
         {
             yield return new WaitForSeconds(delay);
             if (targetEntity != null && targetEntity.ExternalActivity != null)
             {
                 targetEntity.ExternalActivity.moveMods.Remove(freezeMod);
+                targetEntity.RemoveForce(pushForce);
             }
         }
         private void CalculateAndGetValues()
@@ -314,15 +329,18 @@ namespace BaldiShootCore
             float multiplier = 1f + Mathf.Log(1f + anger, 2f) * 0.8f;
             return baseSpeed * multiplier;
         }
+        private AudioManager GetaudMan()
+        {
+            var audmanField = AccessTools.Field(typeof(Baldi), "audMan");
+            return (AudioManager)audmanField.GetValue(baldi);
+        }
         private void PlayAimSound()
         {
-            SoundObject AimSound = BasePlugin.assetMan.Get<SoundObject>("BaldiShootSound");
-            if (AimSound != null)
-            {
-                var audmanField = AccessTools.Field(typeof(Baldi), "audMan");
-                AudioManager audMan = (AudioManager)audmanField.GetValue(baldi);
-                audMan.PlaySingle(AimSound);
-            }
+            audMan.PlaySingle(BasePlugin.assetMan.Get<SoundObject>("BaldiAimingSound"));
+        }
+        private void PlayShootSound()
+        {
+            audMan.PlaySingle(BasePlugin.assetMan.Get<SoundObject>("BaldiShootSound"));
         }
         private void DisableAnimator()
         {
@@ -421,6 +439,26 @@ namespace BaldiShootCore
             if (BulletComponent.appliedModifiers.ContainsKey(targetEntity))
             {
                 targetEntity.ExternalActivity.moveMods.Remove(BulletComponent.appliedModifiers[targetEntity]);
+            }
+        }
+        private void CheckBulletCapacity()
+        {
+            Capacity = BaldiShootingCfg.Capacity;
+            BaseBulletCapacity = BaldiShootingCfg.BulletCapacity;
+            if (BaseBulletCapacity != BaldiShootingCfg.BulletCapacity)
+            {
+                BaseBulletCapacity = BaldiShootingCfg.BulletCapacity;
+                CurrentBulletCapacity = BaseBulletCapacity;
+            }
+            if (BaseBulletCapacity <= 0)
+            {
+                Debug.LogError("Bullet Capacity is below zero!");
+                this.Exit();
+                return;
+            }
+            if ((CurrentBulletCapacity <= bulletAmount) && (Capacity))
+            {
+                bulletAmount = CurrentBulletCapacity;
             }
         }
     }

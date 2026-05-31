@@ -10,7 +10,7 @@ namespace BaldiShootTexturePack
     class BaldicatorAnimatorPatch
     {
         private static Coroutine activeOverlayCoroutine;
-        private static RawImage activeOverlay;
+        private static Image activeOverlay;
         private static Image activeOriginal;
 
         static void Postfix(Animator __instance, string stateName)
@@ -35,18 +35,19 @@ namespace BaldiShootTexturePack
             baldiImage.enabled = false;
             activeOriginal = baldiImage;
 
-            var overlay = baldiImage.transform.Find("BaldicatorOverlay")?.GetComponent<RawImage>();
+            var overlay = baldiImage.transform.Find("BaldicatorOverlay")?.GetComponent<Image>();
             if (overlay == null)
             {
                 var overlayObj = new GameObject("BaldicatorOverlay");
                 overlayObj.transform.SetParent(baldiImage.transform, false);
                 overlayObj.transform.SetAsLastSibling();
-                overlay = overlayObj.AddComponent<RawImage>();
+                overlayObj.transform.localScale = new Vector3(0.42f, 0.42f, 1f); // actually good scale is 0.5f, 0.5f, but my sprites is not completly going down well yeah 
+                overlay = overlayObj.AddComponent<Image>();
 
                 var overlayRect = overlayObj.GetComponent<RectTransform>();
                 var originalRect = baldiImage.GetComponent<RectTransform>();
-                overlayRect.sizeDelta = originalRect.sizeDelta / 512f;
-                overlayRect.anchoredPosition = Vector2.zero;
+                overlayRect.sizeDelta = originalRect.sizeDelta;
+                overlayRect.anchoredPosition = Vector2.zero / 16f;
                 overlayRect.anchorMin = Vector2.zero;
                 overlayRect.anchorMax = Vector2.one;
             }
@@ -62,37 +63,27 @@ namespace BaldiShootTexturePack
             }
         }
 
-        private static IEnumerator OverrideSpritesDuringAnimation(RawImage overlay, Image original, string animationName, Animator animator)
+        private static IEnumerator OverrideSpritesDuringAnimation(Image overlay, Image original, string animationName, Animator animator)
         {
             Sprite[] frames = animationName == "Baldicator_Look"
-                ? BasePlugin.assetMan.Get<Sprite[]>("ok")
-                : BasePlugin.assetMan.Get<Sprite[]>("ok2");
+                ? BasePlugin.assetMan.Get<Sprite[]>("BaldicatorLook")
+                : BasePlugin.assetMan.Get<Sprite[]>("BaldicatorThink");
 
             if (frames == null || frames.Length == 0) yield break;
 
             float frameTime = 0.033f;
-            float duration = 2.3f;
-            float elapsed = 0f;
-            int lastFrame = -1;
 
-            while (elapsed < duration && animator != null)
+            for (int i = 0; i < frames.Length - 1; i++)
             {
-                int frameIndex = Mathf.Min((int)(elapsed / frameTime), frames.Length - 1);
-
-                if (frameIndex != lastFrame && overlay != null)
-                {
-                    overlay.texture = frames[frameIndex].texture;
-                    lastFrame = frameIndex;
-                }
-
-                elapsed += Time.deltaTime;
-                yield return null;
+                overlay.sprite = frames[i];
+                yield return new WaitForSeconds(frameTime);
             }
 
-            if (overlay != null && frames.Length > 0)
-            {
-                overlay.texture = frames[frames.Length - 1].texture;
-            }
+            yield return new WaitForSeconds(0.8f);
+
+            overlay.sprite = frames[frames.Length - 1];
+
+            yield return new WaitForSeconds(1f);
 
             CleanupOverlay();
         }

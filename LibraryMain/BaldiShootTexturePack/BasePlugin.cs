@@ -39,21 +39,23 @@ namespace BaldiShootTexturePack
             var trackerItem = assetMan.Get<ItemObject>("BaldiTracker");
 
             CustomLevelObject[] objects = obj.GetCustomLevelObjects();
-            for (int i = 0; i < objects.Length; i++)
-            {
-                CustomLevelObject levelObj = objects[i];
-                if (levelObj.IsModifiedByMod(Info)) continue;
+            if ((levelId > 0) || ((obj.GetMeta().tags.Contains("endless"))))
+                {
+                for (int i = 0; i < objects.Length; i++)
+                {
+                    CustomLevelObject levelObj = objects[i];
+                    if (levelObj.IsModifiedByMod(Info)) continue;
 
-                levelObj.potentialItems = levelObj.potentialItems.AddRangeToArray(new WeightedItemObject[] {
+                    levelObj.potentialItems = levelObj.potentialItems.AddRangeToArray(new WeightedItemObject[] {
                 new WeightedItemObject()
                 {
                     selection = trackerItem,
-                    weight = 5
-                }}); 
+                    weight = 20
+                }});
 
-                levelObj.MarkAsModifiedByMod(Info);
+                    levelObj.MarkAsModifiedByMod(Info);
+                }
             }
-
             obj.MarkAsNeverUnload();
         }
 
@@ -64,11 +66,12 @@ namespace BaldiShootTexturePack
             yield return "Loading Anton Chigurh sprites...";
 
 
-            Texture2D AntonChigurhAppleSheets = AssetLoader.TextureFromMod(this, "anton_chigurhsheetsapple.png");
+            Texture2D AntonChigurhAppleSheets = AssetLoader.TextureFromMod(this, "anton_chigurhapple.png");
             Texture2D AntonChigurhSlapsSheets = AssetLoader.TextureFromMod(this, "anton_chigurhslaps.png");
             Texture2D AntonChigurhBrokenRulerSheets = AssetLoader.TextureFromMod(this, "anton_chigurhbrokenruler.png");
             Texture2D AntonChigurhTutorialSheets = AssetLoader.TextureFromMod(this, "anton_chigurhtutorial.png");
-            Texture2D AntonChigurhCountdownSheets = AssetLoader.TextureFromMod(this, "anton_chigurhsheetscountdown.png");
+            Texture2D AntonChigurhCountdownSheets = AssetLoader.TextureFromMod(this, "anton_chigurhcountdown.png");
+            Texture2D AntonChigurhBaldicatorSheets = AssetLoader.TextureFromMod(this, "anton_chigurhbaldicator.png");
             Sprite placeholder2 = AssetLoader.SpriteFromMod(this, Vector2.one / 2f, 50f, "placeholder3.png");
             Sprite placeholder3 = AssetLoader.SpriteFromMod(this, Vector2.one / 2f, 50f, "placeholder4.png");
             Sprite AntonChigurhIdleSprite = AssetLoader.SpriteFromMod(this, Vector2.one / 2f, 35f, "anton_chigurhidle.png");
@@ -105,6 +108,15 @@ namespace BaldiShootTexturePack
             );
             Sprite[] AntonChigurhTutorialSprites = AntonChigurhTutorialSpritesArray.Take(7).ToArray();
 
+            Sprite[] AntonChigurhBaldicatorSpritesArray = AssetLoader.SpritesFromSpritesheet(
+                4,
+                4,
+                35f,
+                Vector2.one / 2f,
+                AntonChigurhBaldicatorSheets
+            );
+            Sprite[] AntonChigurhBaldicatotrSprites = AntonChigurhBaldicatorSpritesArray.Take(13).ToArray();
+
             Sprite[] AntonChigurhAppleSprites = AssetLoader.SpritesFromSpritesheet(
                 2,
                 1,
@@ -121,56 +133,46 @@ namespace BaldiShootTexturePack
                 AntonChigurhCountdownSheets
             );
 
-            Sprite[] boiii = new Sprite[]
+            Sprite[] BaldicatorThink = new Sprite[]
             {
-                placeholder3,
-                placeholder3,
-                placeholder3,
-                placeholder3,
-                placeholder3,
-                placeholder3,
-                placeholder3,
-                placeholder3,
-                placeholder3,
-                placeholder2
+                AntonChigurhBaldicatotrSprites[4],
+                AntonChigurhBaldicatotrSprites[4],
+                AntonChigurhBaldicatotrSprites[5],
+                AntonChigurhBaldicatotrSprites[6],
+                AntonChigurhBaldicatotrSprites[7],
+                AntonChigurhBaldicatotrSprites[8],
+                AntonChigurhBaldicatotrSprites[9],
+                AntonChigurhBaldicatotrSprites[10],
+                AntonChigurhBaldicatotrSprites[11],
+                AntonChigurhBaldicatotrSprites[12]
             };
 
-            Sprite[] boiii2 = new Sprite[]
+            Sprite[] BaldicatorLook = new Sprite[]
             {
-                placeholder3,
-                placeholder3,
-                placeholder3,
-                placeholder3,
-                placeholder3,
-                placeholder3,
-                placeholder3,
-                placeholder3,
-                placeholder3,
-                SuitcaseIcon
+                AntonChigurhBaldicatotrSprites[4],
+                AntonChigurhBaldicatotrSprites[4],
+                AntonChigurhBaldicatotrSprites[5],
+                AntonChigurhBaldicatotrSprites[6],
+                AntonChigurhBaldicatotrSprites[7],
+                AntonChigurhBaldicatotrSprites[8],
+                AntonChigurhBaldicatotrSprites[9],
+                AntonChigurhBaldicatotrSprites[10],
+                AntonChigurhBaldicatotrSprites[11],
+                AntonChigurhBaldicatotrSprites[0]
             };
 
-            assetMan.Add<Sprite[]>("ok", boiii);
-            assetMan.Add<Sprite[]>("ok2", boiii2);
+            assetMan.Add<Sprite[]>("BaldicatorThink", BaldicatorThink);
+            assetMan.Add<Sprite[]>("BaldicatorLook", BaldicatorLook);
 
 
             yield return "Loading audio..";
 
-            AudioClip shootClip = AssetLoader.AudioClipFromMod(this, "testing.mp3");
             AudioClip shootClip2 = AssetLoader.AudioClipFromMod(this, "testing2.mp3");
             AudioClip stepClip0 = AssetLoader.AudioClipFromMod(this, "step0.wav");
             AudioClip stepClip1 = AssetLoader.AudioClipFromMod(this, "step1.wav");
             AudioClip stepClip2 = AssetLoader.AudioClipFromMod(this, "step2.wav");
             AudioClip stepClip3 = AssetLoader.AudioClipFromMod(this, "step3.wav");
             AudioClip stepClip4 = AssetLoader.AudioClipFromMod(this, "step4.wav");
-
-
-            SoundObject shootSound = ObjectCreators.CreateSoundObject(
-                shootClip,
-                "Sfx_Baldi_Shoot",
-                SoundType.Effect,
-                Color.red
-            );
-            shootSound.subtitle = true;
 
             SoundObject shootSound2 = ObjectCreators.CreateSoundObject(
                 shootClip2,
@@ -216,7 +218,6 @@ namespace BaldiShootTexturePack
 
 
             shootSound2.subtitle = true;
-            assetMan.Add<SoundObject>("BaldiShootSound", shootSound);
             assetMan.Add<SoundObject>("BaldiShootSound2", shootSound2);
             assetMan.Add<SoundObject>("stepSound0", stepSound0);
             assetMan.Add<SoundObject>("stepSound1", stepSound1);
@@ -263,17 +264,6 @@ namespace BaldiShootTexturePack
             currentSpriteReplacements["BAL_Countdown_Sheet_0"] = AntonChigurhCountdownSprites[0];
             currentSpriteReplacements["BAL_Countdown_Sheet_1"] = AntonChigurhCountdownSprites[1];
             currentSpriteReplacements["BAL_Countdown_Sheet_2"] = AntonChigurhCountdownSprites[2];
-
-            currentSpriteReplacements["BaldicatorSheet_0"] = placeholder3;
-            currentSpriteReplacements["BaldicatorSheet_1"] = placeholder3;
-            currentSpriteReplacements["BaldicatorSheet_2"] = placeholder3;
-            currentSpriteReplacements["BaldicatorSheet_3"] = placeholder3;
-            currentSpriteReplacements["BaldicatorSheet_4"] = placeholder3;
-            currentSpriteReplacements["BaldicatorSheet_5"] = placeholder3;
-            currentSpriteReplacements["BaldicatorSheet_6"] = placeholder3;
-            currentSpriteReplacements["BaldicatorSheet_7"] = placeholder3;
-            currentSpriteReplacements["BaldicatorSheet_8"] = SuitcaseIcon;
-            currentSpriteReplacements["BaldicatorSheet_9"] = SuitcaseIcon;
 
             for (int i = 0; i <= 99; i++)
             {

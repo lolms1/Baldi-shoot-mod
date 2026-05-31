@@ -30,7 +30,7 @@ namespace BaldiShootCore
 
             float cooldown = BaldiShootingCfg.ShootingCooldown;
             float coefficient = BaldiShootingCfg.CooldownCoefficient;
-            float cooldownMultiplier = 1f + (Mathf.Log(1f + anger, 2f) * coefficient/2);
+            float cooldownMultiplier = 1f + (Mathf.Log(1.5f + anger, 2f) * coefficient);
             float currentcooldown = cooldown / cooldownMultiplier;
 
             bool ignoreStuns = BaldiShootingCfg.IgnoreStuns;
@@ -69,7 +69,6 @@ namespace BaldiShootCore
                 shootState.Exit();
                 var previousStateField = AccessTools.Field(typeof(Baldi_SubState), "previousState");
                 var stateBeforeShoot = (NpcState)previousStateField.GetValue(shootState);
-
                 __instance.currentState = stateBeforeShoot;
             }
         }
