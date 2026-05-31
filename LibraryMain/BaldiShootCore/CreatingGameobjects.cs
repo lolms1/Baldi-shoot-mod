@@ -50,7 +50,7 @@ namespace BaldiShootCore
             collisionChild.transform.SetParent(bullet.transform);
             collisionChild.transform.localPosition = Vector3.zero;
             collisionChild.transform.localRotation = Quaternion.LookRotation(direction);
-            collisionChild.transform.localScale = new Vector3(0.3f, 0.3f, 0.3f);
+            collisionChild.transform.localScale = new Vector3(0.2f, 0.2f, 0.2f);
             collisionChild.layer = LayerMask.NameToLayer("Ignore Raycast");
 
             BulletCollisionProxy proxy = collisionChild.AddComponent<BulletCollisionProxy>();
@@ -73,7 +73,7 @@ namespace BaldiShootCore
             visualChild.transform.SetParent(bullet.transform);
             visualChild.transform.localPosition = Vector3.zero;
             visualChild.transform.localRotation = Quaternion.LookRotation(direction);
-            visualChild.transform.localScale = new Vector3(0.3f, 0.3f, 0.3f);
+            visualChild.transform.localScale = new Vector3(0.2f, 0.2f, 0.2f);
             visualChild.layer = LayerMask.NameToLayer("Billboard");
 
             Renderer visualRenderer = visualChild.GetComponent<Renderer>();

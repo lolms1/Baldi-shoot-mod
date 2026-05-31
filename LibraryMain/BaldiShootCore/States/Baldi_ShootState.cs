@@ -93,10 +93,6 @@ namespace BaldiShootCore
 
             // Grab the primary player as the target
             target = baldi.ec.Players[0];
-
-            // Freeze Baldi in place — override both speed and maxSpeed so Navigator doesn't drift
-            npc.Navigator.SetSpeed(0f);
-            npc.Navigator.maxSpeed = 0f;
         }
 
         public override void Update()
@@ -229,10 +225,6 @@ namespace BaldiShootCore
             CleanArea();
             RemoveAppiledMods();
             ResetCycle();
-
-            // Restore Baldi's original speed
-            npc.Navigator.SetSpeed(baldi.baseSpeed);
-            npc.Navigator.maxSpeed = baldi.baseSpeed;
         }
 
         /// <summary>
