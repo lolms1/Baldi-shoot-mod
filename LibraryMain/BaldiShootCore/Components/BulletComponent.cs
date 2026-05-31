@@ -56,7 +56,7 @@ namespace BaldiShootCore
             }
         }
 
-        private void RegisterHit(Entity target)
+        public void RegisterHit(Entity target)
         {
             if (!hitCounts.ContainsKey(target))
             {

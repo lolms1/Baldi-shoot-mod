@@ -88,7 +88,6 @@ namespace BaldiShootCore
             CheckBulletCapacity();
             PlayAimSound();
             DisableAnimator();
-            Debug.LogWarning("anger: " +  anger);
 
             bulletDirections = new Vector3[bulletAmount];
 
