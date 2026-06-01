@@ -10,11 +10,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Rendering;
 
 namespace BaldiShootTexturePack
 {
-    [BepInPlugin("anton.chigurh.texturepack.mod.setup", "Anton Chigurh Texture pack mod", "1.0.0.0")]
+    [BepInPlugin("lolms.bbplusmod.antonchigurhtexturepack", "Anton Chigurh Texture pack mod", "1.0.0.0")]
 
     [BepInDependency("mtm101.rulerp.bbplus.baldidevapi")]
 

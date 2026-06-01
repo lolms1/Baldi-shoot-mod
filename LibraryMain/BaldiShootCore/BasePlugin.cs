@@ -8,11 +8,10 @@ using MTM101BaldAPI.ObjectCreation;
 using MTM101BaldAPI.Registers;
 using System.Collections;
 using UnityEngine;
-using UnityEngine.Rendering;
 
 namespace BaldiShootCore
 {
-    [BepInPlugin("anton.chigurh.mod.setup", "Anton Chigurh mod", "1.0.0.0")]
+    [BepInPlugin("lolms.bbplusmod.baldishootmod", "Baldi shoot mod", "1.0.0.0")]
 
     [BepInDependency("mtm101.rulerp.bbplus.baldidevapi")]
 
