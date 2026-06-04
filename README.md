@@ -46,7 +46,7 @@ Key classes:
 |:---|:---|
 | `Baldi_ShootState` | Custom NPC state — the core of the shooting logic |
 | `BulletComponent` | Bullet behavior (movement, collision, hit tracking) |
-| `BaldiShootingCfg` | All configurable values (timers, speeds, formula) |
+| `BaldiShootCfgData` or `Config.json` | All configurable values (timers, speeds, etc.) |
 
 To extend: create a new mod that references `BaldiShootCore.dll` and use
 `[BepInDependency]` attribute.
