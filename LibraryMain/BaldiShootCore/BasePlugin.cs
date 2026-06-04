@@ -17,12 +17,17 @@ namespace BaldiShootCore
 
     public class BasePlugin : BaseUnityPlugin
     {
+        public static BasePlugin Instance { get; private set; }
+
         public static AssetManager assetMan = new AssetManager();
 
         public static Dictionary<string, Sprite> currentSpriteReplacements = new Dictionary<string, Sprite>();
 
         public void Awake()
         {
+            Instance = this;
+            BaldiShootCfgLoader.LoadAndApply();
+
             Harmony harmony = new Harmony("anton.chigurh.mod.setup");
 
             harmony.PatchAllConditionals();

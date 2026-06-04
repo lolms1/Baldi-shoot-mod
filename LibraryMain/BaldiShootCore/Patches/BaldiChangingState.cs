@@ -28,12 +28,12 @@ namespace BaldiShootCore
             var angerField = AccessTools.Field(typeof(Baldi), "anger");
             float anger = (float)angerField.GetValue(baldi);
 
-            float cooldown = BaldiShootingCfg.ShootingCooldown;
-            float coefficient = BaldiShootingCfg.CooldownCoefficient;
+            float cooldown = BaldiShootCfg.ShootCooldown;
+            float coefficient = BaldiShootCfg.CooldownCoefficient;
             float cooldownMultiplier = 1f + (Mathf.Log(1.5f + anger, 2f) * coefficient);
             float currentcooldown = cooldown / cooldownMultiplier;
 
-            bool ignoreStuns = BaldiShootingCfg.IgnoreStuns;
+            bool ignoreStuns = BaldiShootCfg.IgnoreStuns;
 
             // Don't interrupt praise or an already-running shooting sequence
             NpcState currentState = baldi.behaviorStateMachine.CurrentState;

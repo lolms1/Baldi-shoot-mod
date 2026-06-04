@@ -290,13 +290,13 @@ namespace BaldiShootCore
         }
         private void CalculateAndGetValues()
         {
-            laserTimer = BaldiShootingCfg.LaserTimer;
-            bulletTimer = BaldiShootingCfg.BulletTimer;
-            bulletInterval = BaldiShootingCfg.BulletInterval;
-            cleanupTimer = BaldiShootingCfg.CleanupTimer;
-            coefficient = BaldiShootingCfg.Coefficient;
-            bulletAmount = BaldiShootingCfg.BulletAmount;
-            piercingBullet = BaldiShootingCfg.PiercingBullet;
+            laserTimer = BaldiShootCfg.LaserTimer;
+            bulletTimer = BaldiShootCfg.BulletTimer;
+            bulletInterval = BaldiShootCfg.BulletInterval;
+            cleanupTimer = BaldiShootCfg.CleanupTimer;
+            coefficient = BaldiShootCfg.Coefficient;
+            bulletAmount = BaldiShootCfg.BulletAmount;
+            piercingBullet = BaldiShootCfg.PiercingBullet;
 
             float multiplier = (Mathf.Log(1.5f + anger, 2f) * coefficient);
 
@@ -434,11 +434,11 @@ namespace BaldiShootCore
         }
         private void CheckBulletCapacity()
         {
-            Capacity = BaldiShootingCfg.Capacity;
-            BaseBulletCapacity = BaldiShootingCfg.BulletCapacity;
-            if (BaseBulletCapacity != BaldiShootingCfg.BulletCapacity)
+            Capacity = BaldiShootCfg.Capacity;
+            BaseBulletCapacity = BaldiShootCfg.BulletCapacity;
+            if (BaseBulletCapacity != BaldiShootCfg.BulletCapacity)
             {
-                BaseBulletCapacity = BaldiShootingCfg.BulletCapacity;
+                BaseBulletCapacity = BaldiShootCfg.BulletCapacity;
                 CurrentBulletCapacity = BaseBulletCapacity;
             }
             if (BaseBulletCapacity <= 0)
