@@ -9,6 +9,7 @@ namespace BaldiShootCore
         public static float BulletTimer { get; set; }
         public static float BulletInterval { get; set; }
         public static float CleanupTimer { get; set; }
+        public static float BulletSpeed { get; set; }
         public static float Coefficient { get; set; }
         public static float CooldownCoefficient { get; set; }
         public static int BulletAmount { get; set; }
@@ -30,6 +31,7 @@ namespace BaldiShootCore
             BulletTimer = _defaults.BulletTimer;
             BulletInterval = _defaults.BulletInterval;
             CleanupTimer = _defaults.CleanupTimer;
+            BulletSpeed = _defaults.BulletSpeed;
             Coefficient = _defaults.Coefficient;
             CooldownCoefficient = _defaults.CooldownCoefficient;
             BulletAmount = _defaults.BulletAmount;

@@ -1,12 +1,13 @@
 {
-    "ShootCooldown": 14.0,
-    "LaserTimer": 0.6,
-    "BulletTimer": 0.6,
-    "BulletInterval": 0.8,
-    "CleanupTimer": 2.0,
-    "Coefficient": 3.5,
-    "CooldownCoefficient": 0.4,
-    "BulletAmount": 3,
-    "PiercingBullet": false,
-    "IgnoreStuns": false
+  "ShootCooldown": 14.0,
+  "LaserTimer": 0.6,
+  "BulletTimer": 0.6,
+  "BulletInterval": 0.8,
+  "BulletSpeed": 200.0,
+  "CleanupTimer": 2.0,
+  "Coefficient": 3.5,
+  "CooldownCoefficient": 0.4,
+  "BulletAmount": 3,
+  "PiercingBullet": false,
+  "IgnoreStuns": false
 }

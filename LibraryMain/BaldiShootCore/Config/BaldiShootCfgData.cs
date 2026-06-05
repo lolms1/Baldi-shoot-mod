@@ -6,6 +6,7 @@ public class BaldiShootCfgData
     public float BulletTimer = 0.6f;
     public float BulletInterval = 0.8f;
     public float CleanupTimer = 2f;
+    public float BulletSpeed = 200f;
     public float Coefficient = 3.5f;
     public float CooldownCoefficient = 0.4f;
     public int BulletAmount = 3;

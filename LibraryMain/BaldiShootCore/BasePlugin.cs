@@ -28,7 +28,7 @@ namespace BaldiShootCore
             Instance = this;
             BaldiShootCfgLoader.LoadAndApply();
 
-            Harmony harmony = new Harmony("anton.chigurh.mod.setup");
+            Harmony harmony = new Harmony("lolms.bbplusmod.baldishootmod");
 
             harmony.PatchAllConditionals();
 
@@ -36,7 +36,7 @@ namespace BaldiShootCore
         }
         IEnumerator LoadMyAssets()
         {
-            yield return 2;
+            yield return 3;
 
             yield return "Loading Baldi shooting  sprites...";
 
@@ -63,7 +63,7 @@ namespace BaldiShootCore
 
             SoundObject shootSound = ObjectCreators.CreateSoundObject(
                 shootClip,
-                "*BANG*",
+                "Sfx_Baldi_Shoot_Shoot",
                 SoundType.Effect,
                 Color.red
             );
@@ -71,7 +71,7 @@ namespace BaldiShootCore
 
             SoundObject BaldiAimingSound = ObjectCreators.CreateSoundObject(
                 BaldiAimingClip,
-                "*AIMING*",
+                "Sfx_Baldi_Shoot_Aim",
                 SoundType.Effect,
                 Color.red
             );
@@ -79,7 +79,7 @@ namespace BaldiShootCore
 
             SoundObject BulletHit0Sound = ObjectCreators.CreateSoundObject(
                 BulletHit0Clip,
-                "*HIT*",
+                "Sfx_Baldi_Shoot_Hit",
                 SoundType.Effect,
                 Color.red
             );
@@ -87,7 +87,7 @@ namespace BaldiShootCore
 
             SoundObject BulletHit1Sound = ObjectCreators.CreateSoundObject(
                 BulletHit1Clip,
-                "*HIT*",
+                "Sfx_Baldi_Shoot_Hit",
                 SoundType.Effect,
                 Color.red
             );
@@ -101,6 +101,12 @@ namespace BaldiShootCore
             assetMan.Add<SoundObject>("BaldiShootSound", shootSound);
             assetMan.Add<SoundObject>("BaldiAimingSound", BaldiAimingSound);
             assetMan.Add<SoundObject[]>("BulletHitsSounds", BulletHitsSounds);
+
+            yield return "Localization Loading...";
+
+            string LocalizationPath = Path.Combine(AssetLoader.GetModPath(BasePlugin.Instance), "Subtitles_English.json");
+            AssetLoader.LocalizationFromFile(LocalizationPath, Language.English);
+
 
             yield break;
         }

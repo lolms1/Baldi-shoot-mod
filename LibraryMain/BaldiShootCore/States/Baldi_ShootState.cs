@@ -49,6 +49,7 @@ namespace BaldiShootCore
         private float bulletTimer;
         private float bulletInterval;
         private float cleanupTimer;
+        private float bulletSpeed;
         private float coefficient;
         private int bulletAmount;
         private int BaseBulletCapacity;
@@ -141,7 +142,7 @@ namespace BaldiShootCore
                 if (bulletsFired >= bulletAmount)
                 {
                     phase2Complete = true;
-                    cleanupTimer = timers.cleanupTimer; 
+                    cleanupTimer = timers.cleanupTimer;
                 }
             }
             else
@@ -214,7 +215,7 @@ namespace BaldiShootCore
                 targetEntity.AddForce(pushForce);
 
                 baldi.StartCoroutine(RemoveFreezeAfterDelay(targetEntity, freezeMod, 0.3f, pushForce));
-            }  
+            }
         }
 
         public override void Exit()
@@ -260,7 +261,7 @@ namespace BaldiShootCore
         private GameObject FireBullet()
         {
             Vector3 baldiPos = baldi.transform.position;
-            var bullet = CreateGameobject.CreateBullet(baldi.ec , baldiPos, bulletDirections[bulletsFired], 300f, baldi, piercingBullet, cleanupTimer);
+            var bullet = CreateGameobject.CreateBullet(baldi.ec, baldiPos, bulletDirections[bulletsFired], bulletSpeed, baldi, piercingBullet, cleanupTimer);
             baldi.StartCoroutine(PlayShootFrame());
             return bullet;
         }
@@ -297,6 +298,7 @@ namespace BaldiShootCore
             coefficient = BaldiShootCfg.Coefficient;
             bulletAmount = BaldiShootCfg.BulletAmount;
             piercingBullet = BaldiShootCfg.PiercingBullet;
+            bulletSpeed = BaldiShootCfg.BulletSpeed;
 
             float multiplier = (Mathf.Log(1.5f + anger, 2f) * coefficient);
 
@@ -435,7 +437,7 @@ namespace BaldiShootCore
         private void CheckBulletCapacity()
         {
             Capacity = BaldiShootCfg.Capacity;
-            BaseBulletCapacity = BaldiShootCfg.BulletCapacity;
+            if (!Capacity) return;
             if (BaseBulletCapacity != BaldiShootCfg.BulletCapacity)
             {
                 BaseBulletCapacity = BaldiShootCfg.BulletCapacity;
@@ -447,10 +449,11 @@ namespace BaldiShootCore
                 this.Exit();
                 return;
             }
-            if ((CurrentBulletCapacity <= bulletAmount) && (Capacity))
+            if (CurrentBulletCapacity <= bulletAmount)
             {
                 bulletAmount = CurrentBulletCapacity;
             }
         }
     }
 }
+

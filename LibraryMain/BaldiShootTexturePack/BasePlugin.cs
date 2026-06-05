@@ -8,6 +8,7 @@ using MTM101BaldAPI.ObjectCreation;
 using MTM101BaldAPI.Registers;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using UnityEngine;
 
@@ -25,7 +26,7 @@ namespace BaldiShootTexturePack
 
         public void Awake()
         {
-            Harmony harmony = new Harmony("anton.chigurh.mod.setup");
+            Harmony harmony = new Harmony("lolms.bbplusmod.antonchigurhtexturepack");
 
             harmony.PatchAllConditionals();
 
@@ -39,7 +40,7 @@ namespace BaldiShootTexturePack
 
             CustomLevelObject[] objects = obj.GetCustomLevelObjects();
             if ((levelId > 0) || ((obj.GetMeta().tags.Contains("endless"))))
-                {
+            {
                 for (int i = 0; i < objects.Length; i++)
                 {
                     CustomLevelObject levelObj = objects[i];
@@ -60,7 +61,7 @@ namespace BaldiShootTexturePack
 
         IEnumerator LoadMyAssets()
         {
-            yield return 4;
+            yield return 5;
 
             yield return "Loading Anton Chigurh sprites...";
 
@@ -71,13 +72,9 @@ namespace BaldiShootTexturePack
             Texture2D AntonChigurhTutorialSheets = AssetLoader.TextureFromMod(this, "anton_chigurhtutorial.png");
             Texture2D AntonChigurhCountdownSheets = AssetLoader.TextureFromMod(this, "anton_chigurhcountdown.png");
             Texture2D AntonChigurhBaldicatorSheets = AssetLoader.TextureFromMod(this, "anton_chigurhbaldicator.png");
-            Sprite placeholder2 = AssetLoader.SpriteFromMod(this, Vector2.one / 2f, 50f, "placeholder3.png");
-            Sprite placeholder3 = AssetLoader.SpriteFromMod(this, Vector2.one / 2f, 50f, "placeholder4.png");
             Sprite AntonChigurhIdleSprite = AssetLoader.SpriteFromMod(this, Vector2.one / 2f, 35f, "anton_chigurhidle.png");
             Sprite SuitcaseIcon = AssetLoader.SpriteFromMod(this, Vector2.one / 2f, 100f, "suitcase.png");
 
-            assetMan.Add<Sprite>("placeholder3", placeholder2);
-            assetMan.Add<Sprite>("placeholder4", placeholder3);
             assetMan.Add<Sprite>("AntonChigurhIdle", AntonChigurhIdleSprite);
 
             Sprite[] AntonChigurhSlapsSpritesArray = AssetLoader.SpritesFromSpritesheet(
@@ -166,58 +163,47 @@ namespace BaldiShootTexturePack
 
             yield return "Loading audio..";
 
-            AudioClip shootClip2 = AssetLoader.AudioClipFromMod(this, "testing2.mp3");
             AudioClip stepClip0 = AssetLoader.AudioClipFromMod(this, "step0.wav");
             AudioClip stepClip1 = AssetLoader.AudioClipFromMod(this, "step1.wav");
             AudioClip stepClip2 = AssetLoader.AudioClipFromMod(this, "step2.wav");
             AudioClip stepClip3 = AssetLoader.AudioClipFromMod(this, "step3.wav");
             AudioClip stepClip4 = AssetLoader.AudioClipFromMod(this, "step4.wav");
 
-            SoundObject shootSound2 = ObjectCreators.CreateSoundObject(
-                shootClip2,
-                "Sfx_Baldi_Shoot",
-                SoundType.Effect,
-                Color.red
-            );
-
             SoundObject stepSound0 = ObjectCreators.CreateSoundObject(
                 stepClip0,
-                "*STEP*",
+                "Sfx_Anton_Chigurh_Step",
                 SoundType.Effect,
                 Color.black
             );
 
             SoundObject stepSound1 = ObjectCreators.CreateSoundObject(
                 stepClip1,
-                "*STEP*",
+                "Sfx_Anton_Chigurh_Step",
                 SoundType.Effect,
                 Color.black
             );
 
             SoundObject stepSound2 = ObjectCreators.CreateSoundObject(
                 stepClip2,
-                "*STEP*",
+                "Sfx_Anton_Chigurh_Step",
                 SoundType.Effect,
                 Color.black
             );
 
             SoundObject stepSound3 = ObjectCreators.CreateSoundObject(
                 stepClip3,
-                "*STEP*",
+                "Sfx_Anton_Chigurh_Step",
                 SoundType.Effect,
                 Color.black
             );
 
             SoundObject stepSound4 = ObjectCreators.CreateSoundObject(
                 stepClip4,
-                "*STEP*",
+                "Sfx_Anton_Chigurh_Step",
                 SoundType.Effect,
                 Color.black
             );
 
-
-            shootSound2.subtitle = true;
-            assetMan.Add<SoundObject>("BaldiShootSound2", shootSound2);
             assetMan.Add<SoundObject>("stepSound0", stepSound0);
             assetMan.Add<SoundObject>("stepSound1", stepSound1);
             assetMan.Add<SoundObject>("stepSound2", stepSound2);
@@ -284,9 +270,13 @@ namespace BaldiShootTexturePack
 
             assetMan.Add<ItemObject>("BaldiTracker", trackerItem);
 
+            yield return "Loading Localization...";
+
+            string LocalizationPath = Path.Combine(AssetLoader.GetModPath(this), "Subtitles_English.json");
+            AssetLoader.LocalizationFromFile(LocalizationPath, Language.English);
+
             yield break;
         }
-
 
         IEnumerator RegularLoad() { yield break; }
         IEnumerator PostLoad() { yield break; }
