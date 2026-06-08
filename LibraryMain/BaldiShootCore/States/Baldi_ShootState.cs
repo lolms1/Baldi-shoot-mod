@@ -51,6 +51,8 @@ namespace BaldiShootCore
         private float cleanupTimer;
         private float bulletSpeed;
         private float coefficient;
+        private float multiplierLogBase;
+        private float starterAnger;
         private int bulletAmount;
         private int BaseBulletCapacity;
         private int CurrentBulletCapacity = 99;
@@ -300,12 +302,19 @@ namespace BaldiShootCore
             piercingBullet = BaldiShootCfg.PiercingBullet;
             bulletSpeed = BaldiShootCfg.BulletSpeed;
 
-            float multiplier = (Mathf.Log(1.5f + anger, 2f) * coefficient);
+            multiplierLogBase = BaldiShootCfg.MultiplierLogBase;
+            starterAnger = BaldiShootCfg.StarterAnger;
+
+            float multiplier = (Mathf.Log(starterAnger + anger, multiplierLogBase) * coefficient);
 
             timers.laserTimer = laserTimer / multiplier;
             timers.bulletTimer = bulletTimer / multiplier;
             timers.bulletInterval = bulletInterval / multiplier;
             timers.cleanupTimer = Math.Max(cleanupTimer / multiplier, 1f);
+            if (BaldiShootCfg.DebugBaldisAnger)
+            {
+                Debug.LogError($"Baldi's anger: {anger}");
+            }
 
         }
         private float GetSlideSpeed(int hits, float anger)

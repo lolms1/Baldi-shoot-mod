@@ -29,8 +29,10 @@ namespace BaldiShootCore
             float anger = (float)angerField.GetValue(baldi);
 
             float cooldown = BaldiShootCfg.ShootCooldown;
-            float coefficient = BaldiShootCfg.CooldownCoefficient;
-            float cooldownMultiplier = 1f + (Mathf.Log(1.5f + anger, 2f) * coefficient);
+            float cooldowncoefficient = BaldiShootCfg.CooldownCoefficient;
+            float cooldowmMultiplierLogBase = BaldiShootCfg.CooldownMultiplierLogBase;
+            float cooldownStarterAnger = BaldiShootCfg.CooldownStarterAnger;
+            float cooldownMultiplier = (Mathf.Log(cooldownStarterAnger + anger, cooldowmMultiplierLogBase) * cooldowncoefficient);
             float currentcooldown = cooldown / cooldownMultiplier;
 
             bool ignoreStuns = BaldiShootCfg.IgnoreStuns;

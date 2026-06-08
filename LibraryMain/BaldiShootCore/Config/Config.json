@@ -1,5 +1,5 @@
 {
-  "ShootCooldown": 14.0,
+  "ShootCooldown": 16.0,
   "LaserTimer": 0.6,
   "BulletTimer": 0.6,
   "BulletInterval": 0.8,
@@ -7,7 +7,12 @@
   "CleanupTimer": 2.0,
   "Coefficient": 3.5,
   "CooldownCoefficient": 0.4,
+  "MultiplierLogBase": 2.0,
+  "CooldownMultiplierLogBase": 2.0,
+  "StarterAnger": 1.5,
+  "CooldownStarterAnger": 1.5,
   "BulletAmount": 3,
   "PiercingBullet": false,
-  "IgnoreStuns": false
+  "IgnoreStuns": false,
+  "DebugBaldisAnger": false
 }
