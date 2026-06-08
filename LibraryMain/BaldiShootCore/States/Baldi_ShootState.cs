@@ -171,15 +171,7 @@ namespace BaldiShootCore
 
         private void ProcessAllHits()
         {
-            ITM_NanaPeel bananaPrefab = null;
-            foreach (var item in Resources.FindObjectsOfTypeAll<ITM_NanaPeel>())
-            {
-                if (item.gameObject.scene.name == null)
-                {
-                    bananaPrefab = item;
-                    break;
-                }
-            }
+            ITM_NanaPeel bananaPrefab = BasePlugin.assetMan.Get<ITM_NanaPeel>("ITM_NanaPeel");
 
             Vector3 shootDirection = (target.transform.position - baldi.transform.position).normalized;
 
@@ -226,7 +218,7 @@ namespace BaldiShootCore
 
             EnableAnimator();
             CleanArea();
-            RemoveAppiledMods();
+            RemoveAppliedMods();
             ResetCycle();
         }
 
@@ -415,7 +407,7 @@ namespace BaldiShootCore
             activeBullets.Clear();
             activeLasers.Clear();
         }
-        private void RemoveAppiledMods()
+        private void RemoveAppliedMods()
         {
             foreach (var kvp in BulletComponent.appliedModifiers)
             {

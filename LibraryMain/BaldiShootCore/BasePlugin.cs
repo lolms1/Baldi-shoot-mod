@@ -36,7 +36,7 @@ namespace BaldiShootCore
         }
         IEnumerator LoadMyAssets()
         {
-            yield return 3;
+            yield return 4;
 
             yield return "Loading Baldi shooting  sprites...";
 
@@ -106,6 +106,20 @@ namespace BaldiShootCore
 
             string LocalizationPath = Path.Combine(AssetLoader.GetModPath(BasePlugin.Instance), "Subtitles_English.json");
             AssetLoader.LocalizationFromFile(LocalizationPath, Language.English);
+
+            yield return "Prefabs Loading...";
+
+            ITM_NanaPeel bananaPrefab = null;
+            foreach (var item in Resources.FindObjectsOfTypeAll<ITM_NanaPeel>())
+            {
+                if (item.gameObject.scene.name == null)
+                {
+                    bananaPrefab = item;
+                    break;
+                }
+            }
+
+            assetMan.Add<ITM_NanaPeel>("ITM_NanaPeel", bananaPrefab);
 
 
             yield break;
