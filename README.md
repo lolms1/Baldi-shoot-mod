@@ -29,8 +29,8 @@ Other modders can extend the Core without touching the texture pack.
 ## Install
 
 1. Install [BepInEx](https://github.com/BepInEx/BepInEx) and [MTM101BaldAPI](https://gamebanana.com/mods/383711).
-2. Copy both `.dll` files into `BepInEx/plugins/`.
-3. (Optional) To disable custom sprites, remove `BaldiShootTexturePack.dll`.
+2. Copy `BepInEx` and `BALDI_Data` folders into game files.
+3. (Optional) To disable custom sprites, remove `BaldiShootTexturePack.dll` file from the `BepInEx/plugins/`.
 
 ## Compatibility
 
